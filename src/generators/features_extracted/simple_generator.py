@@ -18,16 +18,15 @@ from generators.abstract_generator import Generator, PATH, IMAGE_PATH
 class FeaturesExtractedSimpleGenerator(Generator):
 
     def __init__(self, raw_dataset):
+        super().__init__(raw_dataset)
         self.images_features = self.extract_features(
             raw_dataset,
-            file_of_dumped_features="/Users/RitaRamos/Documents/INESC-ID/image-caption-remote-sensing-images/generators/all_image_features.pkl")
+            file_of_dumped_features="src/generators/all_image_features.pkl")
 
     def extract_features(self, raw_dataset, file_of_dumped_features="", path=PATH+IMAGE_PATH):
-        print("my file", file_of_dumped_features)
         if os.path.exists(file_of_dumped_features):
             return load(open(file_of_dumped_features, 'rb'))
         else:
-            print("fie does not exist")
             images_features = {}
             extractor_features_model = get_inception_pretrained()
             images_names = [row["filename"] for row in raw_dataset["images"]]

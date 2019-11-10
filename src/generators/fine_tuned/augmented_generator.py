@@ -19,9 +19,9 @@ class FineTunedAugmentedGenerator(FineTunedGenerator):
 
     def get_image(self, img_name):
         # ver se usas o dict_name_img aqui ou fora
-        print("ola")
         img = self.dict_name_img[img_name]
         img = self.augment_image(img)
+        img = preprocess_image_inception(img)[0]
         return img
 
     def augment_image(self, img):
@@ -30,9 +30,6 @@ class FineTunedAugmentedGenerator(FineTunedGenerator):
 
         # second_transformation
         img = rotate_or_flip(img)
-
-        # preprocess according to inception
-        img = preprocess_image_inception(img)
 
         return img
 

@@ -2,25 +2,49 @@ from models.abstract_model import AbstractModel
 from tensorflow.keras.layers import Input, LSTM, Dense, Embedding, TimeDistributed
 from tensorflow.keras.models import Model
 import numpy as np
+import tensorflow as tf
 
 from preprocess_data.tokens import START_TOKEN, END_TOKEN
 
 
-class SimpleModel(AbstractModel):
+class SimpleFineTunedModel(AbstractModel):
 
     EPOCHS = 1
 
-    def __init__(self, vocab_size, max_len, encoder_input_size=131072, lstm_units=256, embedding_size=300):
-        super().__init__(vocab_size, max_len, encoder_input_size, lstm_units, embedding_size)
-        self.model_name = "simple_model"
+    MODEL_DIRECTORY = "././experiments/results/SimpleFineTunedModel/"
+
+    def __init__(self, args, vocab_size, max_len, encoder_input_size, lstm_units=256, embedding_size=300):
+        super().__init__(args, vocab_size, max_len,
+                         encoder_input_size, lstm_units, embedding_size)
         self.model = None
 
     def create(self):
         # Encoder:
-        # We could use only the features as encoder, but they go through another Dense layer to have a representation of specific embedding size
-        input1_images = Input(shape=(self.encoder_input_size,), name='input_1')
-        images_encoder = Dense(
-            self.lstm_units, activation="relu")(input1_images)
+        input1_images = Input(shape=self.encoder_input_size, name='input_1')
+        print("input 1 images", input1_images)
+
+        base_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
+                                                       weights='imagenet')
+        new_input = base_model.input
+        hidden_layer = base_model.layers[-1].output
+
+        for layer in base_model.layers[:249]:
+            layer.trainable = False
+        for layer in base_model.layers[249:]:
+            layer.trainable = True
+
+        finetuned_model = tf.keras.Model(new_input, hidden_layer)
+
+        image = finetuned_model(input1_images)
+        print("how input images now is", image)
+        # a list: [None, 9, 2]
+        shape = image.get_shape().as_list()
+        dim = np.prod(shape[1:])            # dim = prod(9,2) = 18
+        image = tf.reshape(image, [-1, dim])
+
+        print("my input images now are", image)
+
+        images_encoder = Dense(256, activation="relu")(image)
 
         # Decoder:
         # Input(shape=(None, max_len-1)) #-1 since we cut the train_caption_input[:-1]; and shift to train_target[1:]
@@ -39,6 +63,9 @@ class SimpleModel(AbstractModel):
         if self.model is None:
             self.load()
         # self.model.load_weights("simple_model-weights.h5")
+
+        print("this is my model", self.model)
+        print("this is my model layers", self.model.layers)
 
         input_caption = np.zeros((1, self.max_len-1))
 

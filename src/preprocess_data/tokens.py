@@ -1,5 +1,7 @@
 import os
 import numpy as np
+from collections import OrderedDict
+from toolz.itertoolz import unique
 
 START_TOKEN = "<start_seq>"
 END_TOKEN = "<end_seq>"
@@ -13,9 +15,12 @@ def preprocess_tokens(train_captions):
     for caption_tokens in train_captions:
         all_tokens.extend(caption_tokens)
 
-    vocab = list(set(all_tokens))
-    token_to_id = {value: index+1 for index, value in enumerate(vocab)}
-    id_to_token = {index+1: value for index, value in enumerate(vocab)}
+    #vocab = list(set(all_tokens))
+    vocab = list(unique(all_tokens))
+    token_to_id = OrderedDict([(value, index+1)
+                               for index, value in enumerate(vocab)])
+    id_to_token = OrderedDict([(index+1, value)
+                               for index, value in enumerate(vocab)])
 
     token_to_id[PAD_TOKEN] = 0
     id_to_token[0] = PAD_TOKEN

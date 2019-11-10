@@ -8,10 +8,13 @@ from models.abstract_model import AbstractModel
 class Encoder(tf.keras.Model):
     def __init__(self, encoder_state_size):
         super(Encoder, self).__init__()
+        # inception
         self.dense = tf.keras.layers.Dense(
             encoder_state_size, activation="relu")
 
     def call(self, images_features):
+        # inception
+        # reshape
         output = self.dense(images_features)
         return output
 
@@ -42,9 +45,9 @@ class SimpleEncoderDecoderModel(AbstractModel):
 
     def __init__(self, vocab_size, max_len, encoder_input_size=131072, lstm_units=256, embedding_size=300):
         super().__init__(vocab_size, max_len, encoder_input_size, lstm_units, embedding_size)
+        self.optimizer = tf.keras.optimizers.Adam()
         self.encoder = Encoder(lstm_units)
         self.decoder = Decoder(vocab_size, embedding_size, lstm_units)
-        self.optimizer = tf.keras.optimizers.Adam()
 
     def create(self):
         pass
@@ -94,3 +97,6 @@ class SimpleEncoderDecoderModel(AbstractModel):
                     break
                 print("batch loss", loss)
         print("acabou", batch)
+
+    # def generate!!!
+    # ver se funca!!

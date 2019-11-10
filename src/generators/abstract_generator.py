@@ -11,6 +11,7 @@ from tqdm import tqdm
 import tensorflow as tf
 from pickle import load, dump
 from sklearn.utils import shuffle
+import numpy as np
 
 from abc import ABC, abstractmethod
 
@@ -21,11 +22,16 @@ IMAGE_PATH = "/RSICD_images/"
 class Generator(ABC):
 
     def __init__(self, raw_dataset):
-        pass
+        self.raw_dataset = raw_dataset
 
     @abstractmethod
-    def get_image(self, img):
+    def get_image(self, img_name):
         pass
+
+    def get_shape_of_input_image(self):
+        any_img_name = self.raw_dataset["images"][0]["filename"]
+        print("verdadeiro shape", np.shape(self.get_image(any_img_name)))
+        return np.shape(self.get_image(any_img_name))
 
     def generate(self, train_images_names, input_captions, target_captions, vocab_size):
 

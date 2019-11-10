@@ -11,6 +11,7 @@ from tqdm import tqdm
 import tensorflow as tf
 from pickle import load, dump
 from sklearn.utils import shuffle
+import numpy as np
 
 from generators.fine_tuned.augmented_generator import FineTunedAugmentedGenerator
 
@@ -22,8 +23,10 @@ class FeaturesExtractedAugmentedGenerator(FineTunedAugmentedGenerator):
         self.extractor_features_model = get_inception_pretrained()
         # futuro: para nao ser inception podes mandar no init argm model
 
-    def augment_image(self, img):
-        img = super().augment_image(img)  # errado
+    def get_image(self, img_name):
+        img = self.dict_name_img[img_name]
+        img = super().augment_image(img)
+        img = preprocess_image_inception(img)
 
         features = self.extractor_features_model(img)
         img_tensor = tf.reshape(features, [-1])

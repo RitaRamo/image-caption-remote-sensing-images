@@ -21,9 +21,10 @@ from abc import ABC, abstractmethod
 class FineTunedGenerator(Generator):
 
     def __init__(self, raw_dataset):
+        super().__init__(raw_dataset)
         self.dict_name_img = self.get_images_loaded(
             raw_dataset,
-            file_of_dumped_features="/Users/RitaRamos/Documents/INESC-ID/remote-sensing/notebooks/loaded_image_features.pkl")
+            file_of_dumped_features="src/generators/loaded_image_features.pkl")
 
     def get_images_loaded(self, raw_dataset, file_of_dumped_features="", path=PATH+IMAGE_PATH):
         if os.path.exists(file_of_dumped_features):

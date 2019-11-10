@@ -7,20 +7,23 @@ BATCH_SIZE = 1
 class AbstractModel(ABC):
 
     EPOCHS = 30
-    MODEL_DIRECTORY = "./trained_models/"
+    MODEL_DIRECTORY = "././experiments/results/"
 
-    def __init__(self, vocab_size, max_len, encoder_input_size=131072, lstm_units=256, embedding_size=300):
+    def __init__(self, model_name, vocab_size, max_len, encoder_input_size=131072, lstm_units=256, embedding_size=300):
+        self.model_name = model_name
         self.vocab_size = vocab_size
         self.max_len = max_len
         self.encoder_input_size = encoder_input_size
         self.lstm_units = lstm_units
         self.embedding_size = embedding_size
         self.model = None
-        self.model_name = None
 
     @abstractmethod
     def create(self):
         pass
+
+    def summary(self):
+        self.model.summary()
 
     def build(self):
         self.model.compile(
