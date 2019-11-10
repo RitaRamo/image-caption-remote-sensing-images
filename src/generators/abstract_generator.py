@@ -15,7 +15,7 @@ import numpy as np
 
 from abc import ABC, abstractmethod
 
-PATH = "datasets/RSICD/"
+PATH = "src/datasets/RSICD/raw_dataset/"
 IMAGE_PATH = "/RSICD_images/"
 
 
