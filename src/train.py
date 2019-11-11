@@ -24,17 +24,14 @@ from models.abstract_model import BATCH_SIZE
 from models.simple_encoder_decoder import SimpleEncoderDecoderModel
 from models.simple_model import SimpleModel
 from models.simple_model_finetuning import SimpleFineTunedModel
-from preprocess_data.augmented_data.preprocess_augmented_data import (
-    augmented_generator, get_images_loaded)
-from preprocess_data.simple_data.preprocess_data import (extract_features,
-                                                         simple_generator)
+
+
 from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
                                     convert_captions_to_Y, preprocess_tokens)
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['PYTHONHASHSEED'] = '0'
 
-os.environ['PYTHONHASHSEED'] = '0'
 np.random.seed(42)
 random.seed(42)
 tf.random.set_seed(42)
@@ -80,16 +77,6 @@ if __name__ == "__main__":
         "images names -> images vectors (respective representantion of an image)")
     train_generator = None
     val_generator = None
-
-    # images_features = extract_features(
-    #     [row["filename"] for row in raw_dataset["images"]],
-    #     file_of_dumped_features="/Users/RitaRamos/Documents/INESC-ID/image-caption-remote-sensing-images/generators/all_image_features.pkl"
-    # )
-
-    model = None
-
-    print("my args again", args.__dict__)
-    print("my fine_tuning", args.fine_tuning)
 
     if args.fine_tuning:
         logging.info("Fine Tuning")
@@ -178,12 +165,15 @@ if __name__ == "__main__":
 
 
 # Tentar por teste e assim (a idea gerar de loading) -> save do modelo e se é fine-tuning ou não [até às 17:00]
+# por .git_ignore
+# por metodos a private q devem ser private!!
 # por os modelos numa configuração (qual o modelo q vais usar...) [fazer os files]
 # por os modelos a correr o mesmo, fazer last check com todos!!
 # Por os valores dos modelos correctos (epochs, etc)
-# por os modelos a correr o mesmo , fazer last check com todos!!
+# por os modelos a correr o mesmo, fazer last check com todos!!
 # Por a correr online (scp) [GOAL:hoje!!!]
 
+# (yeah por embeddings e a lstm)
 # Por a outra LSTM (até as 16:00)
 # Noite: Por embeddings!! (até as 15:00)
 # por as métricas dos modelos
