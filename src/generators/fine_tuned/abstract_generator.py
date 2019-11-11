@@ -1,21 +1,15 @@
 
 
-from preprocess_data.images import (
-    load_image,
-    preprocess_image_inception,
-    get_inception_pretrained,
-    rotate_or_flip
-)
-
 import os
-from tqdm import tqdm
-import tensorflow as tf
-from pickle import load, dump
-from sklearn.utils import shuffle
-
-from generators.abstract_generator import Generator, PATH, IMAGE_PATH
-
 from abc import ABC, abstractmethod
+from pickle import dump, load
+
+import tensorflow as tf
+from sklearn.utils import shuffle
+from tqdm import tqdm
+
+from generators.abstract_generator import IMAGE_PATH, PATH, Generator
+from preprocess_data.images import load_image
 
 
 class FineTunedGenerator(Generator):

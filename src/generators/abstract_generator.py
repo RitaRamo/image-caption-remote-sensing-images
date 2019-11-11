@@ -53,27 +53,3 @@ class Generator(ABC):
                     'input_1': img_tensor,
                     'input_2': caption_input_tensor
                 }, caption_target_tensor
-
-
-# AugmentedFineTuneGenerator
-# AugmentedFeatureExtractorGenerator
-# SimpleFineTuneGenerator
-# SimpleFeatureExtractorGenerator
-
-# FineTune
-    # augmented_generator -> # FineTunedAugmentedGenerator
-    # simple_generator -># FineTunedSimpleGenerator
-
-#FeatureExtractor (test)
-    # #augmented_generator -> FeaturesExtractedAugmentedGenerator
-    # #simple_generator -> FeaturesExtractedSimpleGenerator
-
-
-# Evaluator
-    # def convert_img_for_test_using_feature_extraction()
-    # def convert_img_for_test_using_finetune()
-
-
-# agumented
-# simple->simple1 (convert_img_for_test_using_feature_extraction); simple2 (convert_img_for_test_using_finetune)
-# augmented-> 1 (convert_img_for_test_using_feature_extraction) and 2 (convert_img_for_test_using_finetune)

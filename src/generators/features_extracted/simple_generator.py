@@ -52,7 +52,6 @@ class FeaturesExtractedSimpleGenerator(Generator):
             return images_features
 
     def get_image(self, img_name):
-        # ver se usas o dict_name_img aqui ou fora
         features = self.images_features[img_name]
         img_tensor = tf.reshape(features, [-1])
         return img_tensor

@@ -24,31 +24,3 @@ class FineTunedSimpleGenerator(FineTunedGenerator):
         img = preprocess_image_inception(img)[0]
 
         return img
-
-
-# FineTunedSimple:
-    # load images + load preprocess image                (se for ler logo__ test difere)
-    # test -> igual
-
-# FineTunedAugmented:
-    # load images + augment image + preprocess image      +(se for feature_extraction+__ test difere)
-    # test (#load images + load preprocess image  )
-
-
-# FeatureExtracot
-    # images_features()
-    # load images + agument + preprocess image + feature extraction
-
-    # test (load images + load process image + feature extraction)
-
-
-# AugmentedFineTuneGenerator
-# AugmentedFeatureExtractorGenerator
-# SimpleFineTuneGenerator
-# SimpleFeatureExtractorGenerator
-
-# FineTuneEvaluator
-# def convert_img_for_test():
-
-# FeturesExtractedEvaluator
-# def convert_img_for_test()

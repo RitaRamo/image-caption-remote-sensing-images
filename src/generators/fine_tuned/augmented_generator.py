@@ -18,23 +18,11 @@ from generators.fine_tuned.abstract_generator import FineTunedGenerator
 class FineTunedAugmentedGenerator(FineTunedGenerator):
 
     def get_image(self, img_name):
-        # ver se usas o dict_name_img aqui ou fora
         img = self.dict_name_img[img_name]
         img = self.augment_image(img)
         img = preprocess_image_inception(img)[0]
         return img
 
     def augment_image(self, img):
-        # first_transformation
-        # img = change_temperature(img)  # What is patch_size??
-
-        # second_transformation
         img = rotate_or_flip(img)
-
         return img
-
-# Generator
-# FineTuner    SimpleFeatureExtracted
-# Simple vs Augmented
-
-        # FineTunerExtractor
