@@ -32,7 +32,7 @@ from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['PYTHONHASHSEED'] = '0'
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-tf.compat.v1.disable_eager_execution()
+# tf.compat.v1.disable_eager_execution()
 
 
 np.random.seed(42)
