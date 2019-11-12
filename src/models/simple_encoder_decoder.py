@@ -97,6 +97,3 @@ class SimpleEncoderDecoderModel(AbstractModel):
                     break
                 print("batch loss", loss)
         print("acabou", batch)
-
-    # def generate!!!
-    # ver se funca!!

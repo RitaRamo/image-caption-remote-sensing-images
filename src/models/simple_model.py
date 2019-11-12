@@ -8,8 +8,6 @@ from preprocess_data.tokens import START_TOKEN, END_TOKEN
 
 class SimpleModel(AbstractModel):
 
-    EPOCHS = 1
-
     MODEL_DIRECTORY = "././experiments/results/SimpleModel/"
 
     def __init__(self, args, vocab_size, max_len, encoder_input_size, lstm_units=256, embedding_size=256):
