@@ -40,7 +40,7 @@ FEATURE_EXTRACTION = True
 AUGMENT_DATA = False
 
 
-# run as: PYTHONHASHSEED=0 python train.py
+# run as: PYTHONHASHSEED=0 python3 src/train.py @experiments/conf_files/FE_A_SM.txt
 if __name__ == "__main__":
     logging.basicConfig(
         format='%(levelname)s: %(message)s', level=logging.INFO)
@@ -145,7 +145,8 @@ if __name__ == "__main__":
     model.summary()
     model.build()
     model.train(train_dataset, val_dataset,
-                BATCH_SIZE, len(val_images_names))
+                len(train_images_names), len(val_images_names))
+
     model.save()
 
     img_name = train_images_names[0]
@@ -164,17 +165,10 @@ if __name__ == "__main__":
     #         img_tensor, axis=0), token_to_id, id_to_token))
 
 
-# Tentar por teste e assim (a idea gerar de loading) -> save do modelo e se é fine-tuning ou não [até às 17:00]
-# por .git_ignore
-# por metodos a private q devem ser private!!
-# por os modelos numa configuração (qual o modelo q vais usar...) [fazer os files]
-# por os modelos a correr o mesmo, fazer last check com todos!!
-# Por os valores dos modelos correctos (epochs, etc)
-# por os modelos a correr o mesmo, fazer last check com todos!!
 # Por a correr online (scp) [GOAL:hoje!!!]
-
-# (yeah por embeddings e a lstm)
 # Por a outra LSTM (até as 16:00)
+# (yeah por embeddings)
+# tratar do erro dos imports!
 # Noite: Por embeddings!! (até as 15:00)
 # por as métricas dos modelos
 
