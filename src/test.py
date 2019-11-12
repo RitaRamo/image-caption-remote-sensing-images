@@ -8,7 +8,10 @@ from generators.features_extracted.simple_generator import \
     FeaturesExtractedSimpleGenerator
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
 from models.simple_model import SimpleModel
+from models.simple_model_finetuning import SimpleFineTunedModel
+
 import os
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['PYTHONHASHSEED'] = '0'
 
@@ -25,14 +28,8 @@ if __name__ == "__main__":
     vocab_size, token_to_id, id_to_token, max_len = vocab_info[
         "vocab_size"], vocab_info["token_to_id"], vocab_info["id_to_token"], vocab_info["max_len"]
 
-    test = get_dataset(
+    test_dataset = get_dataset(
         "src/datasets/RSICD/dataset/test.json")
-    test_images_names, test_captions_of_tokens = test["images_names"], test["captions_tokens"]
-
-    logging.info(
-        "images names -> images vectors (respective representantion of an image)")
-    train_generator = None
-    val_generator = None
 
     if args.fine_tuning:
         logging.info("fine tuning")
@@ -54,11 +51,10 @@ if __name__ == "__main__":
 
     model.load()
 
-    print("hi id to oken, ")
-
     evaluator = Evaluator(generator, model, token_to_id, id_to_token)
 
-    evaluator.evaluate(test_images_names, test_captions_of_tokens)
+    evaluator.evaluate(test_dataset)
+
 
 # por o score; ver se funca
 # por o score até dar no final
