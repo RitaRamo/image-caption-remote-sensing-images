@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import tensorflow as tf
 
-BATCH_SIZE = 1
+BATCH_SIZE = 32
 
 
 class AbstractModel(ABC):
@@ -37,12 +37,12 @@ class AbstractModel(ABC):
         early_stop = tf.keras.callbacks.EarlyStopping(
             monitor='loss', patience=3, verbose=1, restore_best_weights=True)
 
-        self.model.fit_generator(train_dataset, epochs=self.EPOCHS, steps_per_epoch=(
-            BATCH_SIZE),
-            # len_train_dataset/BATCH_SIZE),
+        self.model.fit_generator(
+            train_dataset,
+            epochs=self.EPOCHS,
+            steps_per_epoch=len_train_dataset/BATCH_SIZE,
             validation_data=val_dataset,
-            # validation_steps=len_val_dataset/BATCH_SIZE,
-            validation_steps=BATCH_SIZE,
+            validation_steps=len_val_dataset/BATCH_SIZE,
             callbacks=[early_stop]
         )
 
