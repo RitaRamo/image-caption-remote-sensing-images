@@ -30,7 +30,6 @@ class Generator(ABC):
 
     def get_shape_of_input_image(self):
         any_img_name = self.raw_dataset["images"][0]["filename"]
-        print("verdadeiro shape", np.shape(self.get_image(any_img_name)))
         return np.shape(self.get_image(any_img_name))
 
     def generate(self, train_images_names, input_captions, target_captions, vocab_size):
