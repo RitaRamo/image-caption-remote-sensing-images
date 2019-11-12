@@ -1,0 +1,6 @@
+--file_name
+FT_A_SM.txt
+--model_class_str
+SimpleFineTunedModel
+--fine_tuning
+--augment_data
