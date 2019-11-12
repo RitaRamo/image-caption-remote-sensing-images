@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 import tensorflow as tf
 
-BATCH_SIZE = 32
+BATCH_SIZE = 2
 
 
 class AbstractModel(ABC):
 
-    EPOCHS = 30
+    EPOCHS = 1
     MODEL_DIRECTORY = "././experiments/results/"
 
     def __init__(self, model_name, vocab_size, max_len, encoder_input_size=131072, lstm_units=256, embedding_size=300):
@@ -40,9 +40,9 @@ class AbstractModel(ABC):
         self.model.fit_generator(
             train_dataset,
             epochs=self.EPOCHS,
-            steps_per_epoch=len_train_dataset/BATCH_SIZE,
+            steps_per_epoch=1,  # len_train_dataset/BATCH_SIZE,
             validation_data=val_dataset,
-            validation_steps=len_val_dataset/BATCH_SIZE,
+            validation_steps=1,  # len_val_dataset/BATCH_SIZE,
             callbacks=[early_stop]
         )
 
