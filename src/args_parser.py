@@ -9,6 +9,9 @@ def get_args():
     parser.add_argument(
         '--model_class_str', help='class name of the model to train', default="SimpleModel")
 
+    parser.add_argument(
+        '--embedding_type', help='embedding type (glove,spacy or None)', default=None)
+
     parser.add_argument('--augment_data', action='store_true', default=False,
                         help='Set a switch to true')
 
