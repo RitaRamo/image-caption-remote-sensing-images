@@ -9,6 +9,8 @@ from generators.features_extracted.simple_generator import \
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
 from models.simple_model import SimpleModel
 from models.simple_model_finetuning import SimpleFineTunedModel
+from models.fine_model import FineModel
+
 
 import os
 
@@ -46,12 +48,14 @@ if __name__ == "__main__":
         str(args.__dict__),
         vocab_size,
         max_len,
-        generator.get_shape_of_input_image()
+        token_to_id,
+        id_to_token,
+        generator.get_shape_of_input_image(),
     )
 
     model.load()
 
-    evaluator = Evaluator(generator, model, token_to_id, id_to_token)
+    evaluator = Evaluator(generator, model)
 
     evaluator.evaluate(test_dataset)
 

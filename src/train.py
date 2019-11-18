@@ -24,6 +24,7 @@ from models.abstract_model import BATCH_SIZE
 from models.simple_encoder_decoder import SimpleEncoderDecoderModel
 from models.simple_model import SimpleModel
 from models.simple_model_finetuning import SimpleFineTunedModel
+from models.fine_model import FineModel
 
 
 from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
@@ -32,7 +33,6 @@ from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['PYTHONHASHSEED'] = '0'
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-# tf.compat.v1.disable_eager_execution()
 
 
 np.random.seed(42)
@@ -141,7 +141,10 @@ if __name__ == "__main__":
         str(args.__dict__),
         vocab_size,
         max_len,
-        generator.get_shape_of_input_image()
+        token_to_id,
+        id_to_token,
+        generator.get_shape_of_input_image(),
+        args.embedding_type
     )
 
     model.create()
