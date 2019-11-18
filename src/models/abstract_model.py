@@ -9,13 +9,27 @@ class AbstractModel(ABC):
     EPOCHS = 1
     MODEL_DIRECTORY = "././experiments/results/"
 
-    def __init__(self, model_name, vocab_size, max_len, encoder_input_size=131072, lstm_units=256, embedding_size=300):
+    def __init__(
+        self,
+        model_name,
+        vocab_size,
+        max_len,
+        token_to_id,
+        id_to_token,
+        encoder_input_size,
+        embedding_type=None,
+        embedding_size=300,
+        lstm_units=256
+    ):
         self.model_name = model_name
         self.vocab_size = vocab_size
         self.max_len = max_len
+        self.token_to_id = token_to_id
+        self.id_to_token = id_to_token
         self.encoder_input_size = encoder_input_size
-        self.lstm_units = lstm_units
+        self.embedding_type = embedding_type
         self.embedding_size = embedding_size
+        self.lstm_units = lstm_units
         self.model = None
 
     @abstractmethod
