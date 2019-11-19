@@ -9,7 +9,6 @@ from generators.features_extracted.simple_generator import \
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
 from models.simple_model import SimpleModel
 from models.simple_model_finetuning import SimpleFineTunedModel
-from models.fine_model import FineModel
 
 
 import os

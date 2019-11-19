@@ -24,7 +24,6 @@ from models.abstract_model import BATCH_SIZE
 from models.simple_encoder_decoder import SimpleEncoderDecoderModel
 from models.simple_model import SimpleModel
 from models.simple_model_finetuning import SimpleFineTunedModel
-from models.fine_model import FineModel
 
 
 from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
