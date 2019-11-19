@@ -1,0 +1,5 @@
+--file_name
+FE_A_SM_EG.txt
+--augment_data
+--embedding_type
+glove

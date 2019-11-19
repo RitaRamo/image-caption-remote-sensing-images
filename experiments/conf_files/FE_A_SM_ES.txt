@@ -1,0 +1,5 @@
+--file_name
+FE_A_SM_ES.txt
+--augment_data
+--embedding_type
+spacy
