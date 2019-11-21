@@ -65,10 +65,12 @@ if __name__ == "__main__":
     train = get_dataset(
         "src/datasets/RSICD/dataset/train.json")
     train_images_names, train_captions_of_tokens = train["images_names"], train["captions_tokens"]
+    logging.info("len train_images_names %s", len(train_images_names))
 
     val = get_dataset(
         "src/datasets/RSICD/dataset/val.json")
     val_images_names, val_captions_of_tokens = val["images_names"], val["captions_tokens"]
+    logging.info("len val_images_names %s", len(val_images_names))
 
     logging.info(
         "captions tokens -> captions ids, since the NN doesnot read tokens but rather numbers")
