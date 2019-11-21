@@ -51,7 +51,7 @@ class AbstractModel(ABC):
         early_stop = tf.keras.callbacks.EarlyStopping(
             monitor='loss', patience=3, verbose=1, restore_best_weights=True)
 
-        self.model.fit(
+        self.model.fit_generator(
             train_dataset,
             epochs=self.EPOCHS,
             steps_per_epoch=1,  # len_train_dataset/BATCH_SIZE,
