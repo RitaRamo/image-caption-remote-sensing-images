@@ -47,7 +47,7 @@ if __name__ == "__main__":
     logging.basicConfig(
         format='%(levelname)s: %(message)s', level=logging.INFO)
 
-    logging.info("tensorflow version", tf.__version__)
+    logging.info("tensorflow version %s", tf.__version__)
 
     args = get_args()
     logging.info(args.__dict__)
