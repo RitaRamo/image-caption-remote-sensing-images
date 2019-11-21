@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import tensorflow as tf
+import json
 
 BATCH_SIZE = 2
 
@@ -61,10 +62,15 @@ class AbstractModel(ABC):
         )
 
     def get_path(self):
-        return self.MODEL_DIRECTORY + self.model_name+'.h5'
+        return self.MODEL_DIRECTORY + 'trained_models/' + self.model_name+'.h5'
 
     def save(self):
         self.model.save(self.get_path())
 
     def load(self):
         self.model = tf.keras.models.load_model(self.get_path())
+
+    def save_scores(self, scores):
+        scores_path = self.MODEL_DIRECTORY + 'evaluation_scores/' + self.model_name
+        with open(scores_path+'.json', 'w+') as f:
+            json.dump(scores, f, indent=2)

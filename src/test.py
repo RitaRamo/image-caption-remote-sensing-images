@@ -56,9 +56,6 @@ if __name__ == "__main__":
 
     evaluator = Evaluator(generator, model)
 
-    evaluator.evaluate(test_dataset)
+    scores = evaluator.evaluate(test_dataset)
 
-
-# por o score; ver se funca
-# por o score até dar no final
-# continuar com o resto do train
+    model.save_scores(scores)
