@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import tensorflow as tf
 import json
 
-BATCH_SIZE = 2
+BATCH_SIZE = 16
 
 
 class AbstractModel(ABC):
@@ -55,9 +55,9 @@ class AbstractModel(ABC):
         self.model.fit_generator(
             train_dataset,
             epochs=self.EPOCHS,
-            steps_per_epoch=1,  # len_train_dataset/BATCH_SIZE,
+            steps_per_epoch=len_train_dataset/BATCH_SIZE,
             validation_data=val_dataset,
-            validation_steps=1,  # len_val_dataset/BATCH_SIZE,
+            validation_steps=len_val_dataset/BATCH_SIZE,
             callbacks=[early_stop]
         )
 
