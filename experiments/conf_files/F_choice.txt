@@ -1,3 +1,12 @@
 --file_name
 choice.txt
---augment_data
+--model_class_str
+SimpleFineTunedModel
+--batch_size
+1
+--epochs
+1
+--disable_steps
+--fine_tuning
+--embedding_type
+spacy

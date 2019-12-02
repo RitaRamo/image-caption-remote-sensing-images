@@ -15,7 +15,7 @@ class SimpleFineTunedModel(SimpleModel):
 
     def __init__(
         self,
-        model_name,
+        args,
         vocab_size,
         max_len,
         token_to_id,
@@ -25,7 +25,7 @@ class SimpleFineTunedModel(SimpleModel):
         embedding_size=300,
         lstm_units=256
     ):
-        super().__init__(model_name, vocab_size, max_len, token_to_id, id_to_token,
+        super().__init__(args, vocab_size, max_len, token_to_id, id_to_token,
                          encoder_input_size, embedding_type, embedding_size, lstm_units)
         self.model = None
 

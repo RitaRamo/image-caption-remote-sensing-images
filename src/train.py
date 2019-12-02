@@ -20,7 +20,6 @@ from generators.features_extracted.augmented_generator import (
 from generators.features_extracted.simple_generator import \
     FeaturesExtractedSimpleGenerator
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
-from models.abstract_model import BATCH_SIZE
 from models.simple_encoder_decoder import SimpleEncoderDecoderModel
 from models.simple_model import SimpleModel
 from models.simple_model_finetuning import SimpleFineTunedModel
@@ -127,12 +126,12 @@ if __name__ == "__main__":
     train_dataset = tf.data.Dataset.from_generator(
         lambda: train_generator,
         ({'input_1': tf.float32, 'input_2': tf.float32}, tf.float32)
-    ).batch(BATCH_SIZE)
+    ).batch(args.batch_size)
 
     val_dataset = tf.data.Dataset.from_generator(
         lambda: val_generator,
         ({'input_1': tf.float32, 'input_2': tf.float32}, tf.float32)
-    ).batch(BATCH_SIZE)
+    ).batch(args.batch_size)
 
     logging.info("create and run model")
     logging.info("qual é o tamanho do input %s",
@@ -141,7 +140,7 @@ if __name__ == "__main__":
     model_class = globals()[args.model_class_str]
 
     model = model_class(
-        str(args.__dict__),
+        args,
         vocab_size,
         max_len,
         token_to_id,
