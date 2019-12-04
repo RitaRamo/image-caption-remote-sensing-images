@@ -30,7 +30,7 @@ from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['PYTHONHASHSEED'] = '0'
-#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 
 np.random.seed(42)
