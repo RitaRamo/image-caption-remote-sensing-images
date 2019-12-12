@@ -8,6 +8,8 @@ from generators.features_extracted.simple_generator import \
     FeaturesExtractedSimpleGenerator
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
 from models.simple_model import SimpleModel
+from models.simple_model2 import SimpleModel2
+
 from models.simple_model_finetuning import SimpleFineTunedModel
 
 
@@ -44,7 +46,7 @@ if __name__ == "__main__":
     model_class = globals()[args.model_class_str]
 
     model = model_class(
-        str(args.__dict__),
+        args,
         vocab_size,
         max_len,
         token_to_id,
