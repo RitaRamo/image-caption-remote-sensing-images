@@ -8,7 +8,7 @@ from generators.features_extracted.simple_generator import \
     FeaturesExtractedSimpleGenerator
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
 from models.simple_model import SimpleModel
-from models.simple_model2 import SimpleModel2
+#from models.simple_model2 import SimpleModel2
 
 from models.simple_model_finetuning import SimpleFineTunedModel
 
