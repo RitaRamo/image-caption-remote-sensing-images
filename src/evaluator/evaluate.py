@@ -30,18 +30,19 @@ class Evaluator():
 
         references_captions = list(test_dataset.values())
         scores = self.compare_results(
-            [references_captions[0]], [predicted])
+            [references_captions[0]], predicted)
 
         return scores
 
-    def compare_results(self, references_captions, predicted_caption):
+    def compare_results(self, references_captions, predicted_captions):
         print("this are reds", references_captions)
-        print("this are predicted_caption", predicted_caption)
+        print("this are predicted_caption", predicted_captions)
 
         nlgeval = NLGEval()  # loads the models
         metrics_dict = nlgeval.compute_metrics(
-            references_captions, predicted_caption)
+            references_captions, predicted_captions)
         return metrics_dict
+        # return {}
 
         # metrics_dict = compute_individual_metrics(
         #     references_captions, predicted_caption)
