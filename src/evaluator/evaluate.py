@@ -26,11 +26,12 @@ class Evaluator():
             # scores = self.compare_results(
             #     references_captions_of_image, text_generated)
             predicted.append(text_generated)
-            break
 
         references_captions = list(test_dataset.values())
         scores = self.compare_results(
-            [references_captions[0]], predicted)
+            references_captions, predicted)
+        # so funca se tivr + q um elemento, senão usar o outro para comparar!
+        # TODO: fazer score individualmnt, guardando as categorias do maior score e as do pior
 
         return scores
 
