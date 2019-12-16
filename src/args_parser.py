@@ -7,7 +7,7 @@ def get_args():
         '--file_name', help='name of file that was used to fill the all other arguments', default=None)
 
     parser.add_argument(
-        '--model_class_str', help='class name of the model to train', default="SimpleModel")
+        '--model_class_str', help='class name of the model to train', default="BasicModel")
 
     parser.add_argument('--epochs', type=int, default=33,
                         help='define epochs to train the model')
