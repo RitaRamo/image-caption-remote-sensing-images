@@ -7,7 +7,7 @@ from preprocess_data.tokens import START_TOKEN, END_TOKEN
 
 import spacy
 import tensorflow as tf
-from models.layers import lstm
+#from models.layers import lstm
 
 
 class BasicModel(AbstractModel):
@@ -80,7 +80,7 @@ class BasicModel(AbstractModel):
 
     def _get_decoder_outputs(self, inputs2_captions, encoder_state):
         words_embeddings = self._get_embedding_layer()(inputs2_captions)
-        decoder_hiddens = lstm(self.units, return_sequences=True, return_state=False)(
+        decoder_hiddens = LSTM(self.units, return_sequences=True, return_state=False)(
             words_embeddings, initial_state=[encoder_state, encoder_state])
         outputs = TimeDistributed(
             Dense(self.vocab_size, activation='softmax'))(decoder_hiddens)
