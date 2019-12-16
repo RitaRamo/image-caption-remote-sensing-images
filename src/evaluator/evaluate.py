@@ -45,8 +45,8 @@ class Evaluator():
         print("this are predicted_caption", predicted_captions)
 
         print("len ref", len(references_captions))
-        print("len caption", len(predicted))
-        print("equal ", len(references_captions) == len(predicted))
+        print("len caption", len(predicted_captions))
+        print("equal ", len(references_captions) == len(predicted_captions))
 
         nlgeval = NLGEval()  # loads the models
         metrics_dict = nlgeval.compute_metrics(
