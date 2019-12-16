@@ -14,6 +14,8 @@ class Evaluator():
     def evaluate(self, test_dataset):
         predicted = []
         # nlgeval = NLGEval()  # loads the models
+        # ifi ==3 ver se dá
+        i = 0
         for img_name in test_dataset.keys():
 
             img_tensor = self.generator.get_image(img_name)
@@ -26,8 +28,16 @@ class Evaluator():
             # scores = self.compare_results(
             #     references_captions_of_image, text_generated)
             predicted.append(text_generated)
+            i += 1
+            if i == 5:
+                break
 
         references_captions = list(test_dataset.values())
+
+        print("len ref", len(references_captions))
+        print("len caption", len(predicted))
+        print("equal ", len(references_captions) == len(predicted))
+
         scores = self.compare_results(
             references_captions, predicted)
         # so funca se tivr + q um elemento, senão usar o outro para comparar!
