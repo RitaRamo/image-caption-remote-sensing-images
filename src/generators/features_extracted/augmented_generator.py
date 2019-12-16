@@ -29,6 +29,5 @@ class FeaturesExtractedAugmentedGenerator(FineTunedAugmentedGenerator):
         img = preprocess_image_inception(img)
 
         features = self.extractor_features_model(img)
-        img_tensor = tf.reshape(features, [-1])
-
-        return img_tensor
+        # [0] to remove first dim [1, 64, 2048] -> [64, 2048]
+        return features[0]

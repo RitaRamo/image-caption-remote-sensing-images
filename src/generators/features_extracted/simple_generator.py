@@ -11,6 +11,7 @@ from tqdm import tqdm
 import tensorflow as tf
 from pickle import load, dump
 from sklearn.utils import shuffle
+import numpy as np
 
 from generators.abstract_generator import Generator, PATH, IMAGE_PATH
 
@@ -53,5 +54,5 @@ class FeaturesExtractedSimpleGenerator(Generator):
 
     def get_image(self, img_name):
         features = self.images_features[img_name]
-        img_tensor = tf.reshape(features, [-1])
-        return img_tensor
+        # [0] to remove first dim [1, 64, 2048] -> [64, 2048]
+        return features[0]
