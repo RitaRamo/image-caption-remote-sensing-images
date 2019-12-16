@@ -24,7 +24,6 @@ from models.simple_encoder_decoder import SimpleEncoderDecoderModel
 from models.simple_model import SimpleModel
 from models.basic_model import BasicModel
 from models.attention_model import AttentionModel
-from models.attention_model1 import AttentionModel1
 
 
 from models.simple_model_finetuning import SimpleFineTunedModel
