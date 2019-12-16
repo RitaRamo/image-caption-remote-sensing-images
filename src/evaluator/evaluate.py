@@ -52,6 +52,7 @@ class Evaluator():
         nlgeval = NLGEval()  # loads the models
         metrics_dict = nlgeval.compute_metrics(
             references_captions, predicted_captions)
+        print("this are dic metrics", metrics_dict)
         return metrics_dict
         # return {}
 
