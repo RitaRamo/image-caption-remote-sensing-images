@@ -22,7 +22,7 @@ from generators.features_extracted.simple_generator import \
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
 from models.simple_encoder_decoder import SimpleEncoderDecoderModel
 from models.simple_model import SimpleModel
-from models.simple_model2 import SimpleModel2
+from models.basic_model import BasicModel
 from models.attention_model import AttentionModel
 from models.attention_model1 import AttentionModel1
 
@@ -58,8 +58,6 @@ if __name__ == "__main__":
 
     logging.info("Num GPUs Available: %s", len(
         tf.config.experimental.list_physical_devices('GPU')))
-
-    print("gpu is available", tf.test.is_gpu_available())
 
     logging.info("load and split dataset")
     raw_dataset = pd.read_json(PATH + "dataset_rsicd.json")
