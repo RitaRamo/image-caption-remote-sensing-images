@@ -32,7 +32,7 @@ class Evaluator():
             if i == 5:
                 break
 
-        references_captions = list(test_dataset.values())
+        references_captions = list(test_dataset.values())[:i]
 
         print("len ref", len(references_captions))
         print("len caption", len(predicted))
