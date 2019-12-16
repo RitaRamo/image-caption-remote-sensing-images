@@ -8,7 +8,7 @@ from generators.features_extracted.simple_generator import \
     FeaturesExtractedSimpleGenerator
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
 from models.simple_model import SimpleModel
-#from models.simple_model2 import SimpleModel2
+from models.simple_model2 import SimpleModel2
 
 from models.simple_model_finetuning import SimpleFineTunedModel
 
@@ -59,5 +59,7 @@ if __name__ == "__main__":
     evaluator = Evaluator(generator, model)
 
     scores = evaluator.evaluate(test_dataset)
+
+    print("this are the scores", scores)
 
     model.save_scores(scores)

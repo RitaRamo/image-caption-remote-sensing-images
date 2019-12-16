@@ -22,6 +22,11 @@ from generators.features_extracted.simple_generator import \
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
 from models.simple_encoder_decoder import SimpleEncoderDecoderModel
 from models.simple_model import SimpleModel
+from models.simple_model2 import SimpleModel2
+from models.attention_model import AttentionModel
+from models.attention_model1 import AttentionModel1
+
+
 from models.simple_model_finetuning import SimpleFineTunedModel
 
 
@@ -41,7 +46,7 @@ FEATURE_EXTRACTION = True
 AUGMENT_DATA = False
 
 
-# run as: PYTHONHASHSEED=0 python3 src/train.py @experiments/conf_files/FE_A_SM.txt
+# run as: PYTHONHASHSEED=0 python3 src/train.py @experiments/conf_files/FE_S_SM.txt
 if __name__ == "__main__":
     logging.basicConfig(
         format='%(levelname)s: %(message)s', level=logging.INFO)
@@ -53,6 +58,8 @@ if __name__ == "__main__":
 
     logging.info("Num GPUs Available: %s", len(
         tf.config.experimental.list_physical_devices('GPU')))
+
+    print("gpu is available", tf.test.is_gpu_available())
 
     logging.info("load and split dataset")
     raw_dataset = pd.read_json(PATH + "dataset_rsicd.json")
@@ -132,6 +139,33 @@ if __name__ == "__main__":
         lambda: val_generator,
         ({'input_1': tf.float32, 'input_2': tf.float32}, tf.float32)
     ).batch(args.batch_size)
+
+    # for i in train_dataset.take(2):
+    #     print("opaaa", np.shape(i))
+    #     print("ai", np.shape(i[0]))
+    #     print("a2", np.shape(i[1]))
+    # print("agora é q e", next(iter(train_dataset)))
+
+    # def gen():
+    #     lista = [0, 1, 2, 3, 4, 5]
+    #     while True:
+    #         for i in lista:
+    #             yield i
+
+    # train_dataset = tf.data.Dataset.from_generator(
+    #     gen,
+    #     tf.int64
+    # ).batch(args.batch_size)
+
+    # # train_dataset = iter(train_dataset)
+    # # for a in range(3):  # [0,1,2,3] ; [4,5,0,1];[2,3,4,5]
+    # #     # for i in train_dataset.take(2): [1,2]; [3,4]
+    # #     #     print("opaaa", i)
+    # #     print("opaa memso", a, next((train_dataset)))
+
+    # # for a in range(5):
+    # for i in train_dataset.take(5):
+    #     print("\ola", i)
 
     logging.info("create and run model")
     logging.info("qual é o tamanho do input %s",
