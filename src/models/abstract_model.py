@@ -17,7 +17,7 @@ class AbstractModel(ABC):
         encoder_input_size,
         embedding_type=None,
         embedding_size=300,
-        lstm_units=256
+        units=256
     ):
         self.args = args
         self.vocab_size = vocab_size
@@ -27,7 +27,7 @@ class AbstractModel(ABC):
         self.encoder_input_size = encoder_input_size
         self.embedding_type = embedding_type
         self.embedding_size = embedding_size
-        self.lstm_units = lstm_units
+        self.units = units
         self.model = None
 
     @abstractmethod
@@ -50,8 +50,8 @@ class AbstractModel(ABC):
             train_steps = 1
             val_steps = 1
         else:
-            train_steps = len_train_dataset/self.args.batch_size
-            val_steps = len_val_dataset/self.args.batch_size
+            train_steps = int(len_train_dataset/self.args.batch_size)
+            val_steps = int(len_val_dataset/self.args.batch_size)
 
         early_stop = tf.keras.callbacks.EarlyStopping(
             monitor='loss', patience=3, verbose=1, restore_best_weights=True)
@@ -75,6 +75,8 @@ class AbstractModel(ABC):
         self.model = tf.keras.models.load_model(self.get_path())
 
     def save_scores(self, scores):
+        scores = {key: str(values) for key, values in scores.items()}
+
         scores_path = self.MODEL_DIRECTORY + \
             'evaluation_scores/' + str(self.args.__dict__)
         with open(scores_path+'.json', 'w+') as f:
