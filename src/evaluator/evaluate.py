@@ -41,6 +41,8 @@ class Evaluator():
         return scores
 
     def compare_results(self, references_captions, predicted_captions):
+        references_captions = references_captions[:1093]
+        predicted_captions = predicted_captions[:1093]
         print("this are reds", references_captions)
         print("this are predicted_caption", predicted_captions)
 
