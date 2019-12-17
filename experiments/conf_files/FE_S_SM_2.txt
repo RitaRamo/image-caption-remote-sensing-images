@@ -1,4 +1,4 @@
 --file_name
-FE_S_SM.txt
+FE_S_SM_2.txt
 --model_class_str
 BasicModel
