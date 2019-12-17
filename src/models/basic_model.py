@@ -12,7 +12,7 @@ import tensorflow as tf
 
 class BasicModel(AbstractModel):
 
-    MODEL_DIRECTORY = "././experiments/results/SimpleModel/"
+    MODEL_DIRECTORY = "././experiments/results/BasicModel/"
 
     def __init__(
         self,
