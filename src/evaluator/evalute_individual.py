@@ -37,7 +37,7 @@ class EvaluatorIndividualMetrics():
             break
 
         avg_metrics = {metric: total_score /
-                       n_comparations for metric, total_score in scores.items()}
+                       n_comparations for metric, total_score in metrics.items()}
 
         return avg_metrics
 
