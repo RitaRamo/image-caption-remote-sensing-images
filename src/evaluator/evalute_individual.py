@@ -18,7 +18,7 @@ class EvaluatorIndividualMetrics():
         # nlgeval = NLGEval()  # loads the models
         # ifi ==3 ver se dá
         n_comparations = 0
-        for img_name, references in test_dataset.values():
+        for img_name, references in test_dataset.items():
 
             img_tensor = self.generator.get_image(img_name)
             img_tensor = tf.expand_dims(img_tensor, axis=0)
