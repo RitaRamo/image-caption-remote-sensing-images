@@ -3,6 +3,7 @@ from args_parser import get_args
 import pandas as pd
 from dataset import get_dataset, get_vocab_info
 from evaluator.evaluate import Evaluator
+from evaluator.evalute_individual import EvaluatorIndividualMetrics
 from generators.abstract_generator import PATH
 from generators.features_extracted.simple_generator import \
     FeaturesExtractedSimpleGenerator
@@ -56,7 +57,8 @@ if __name__ == "__main__":
 
     model.load()
 
-    evaluator = Evaluator(generator, model)
+    evaluator = EvaluatorIndividualMetrics(
+        generator, model)  # Evaluator(generator, model)
 
     scores = evaluator.evaluate(test_dataset)
 
