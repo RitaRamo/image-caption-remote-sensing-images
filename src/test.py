@@ -62,7 +62,6 @@ if __name__ == "__main__":
 
     scores = evaluator.evaluate(test_dataset)
 
-    print("this are the scores", scores)
-    print("this are the scores", type(scores))
+    #print("this are the scores", scores)
 
     model.save_scores(scores)

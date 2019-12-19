@@ -4,6 +4,7 @@ import tensorflow as tf
 #from nlgeval import NLGEval
 #from nlgeval import compute_metrics
 from nlgeval import NLGEval
+from collections import defaultdict
 
 
 class EvaluatorIndividualMetrics():
@@ -13,7 +14,8 @@ class EvaluatorIndividualMetrics():
         self.model = model
 
     def evaluate(self, test_dataset):
-        predicted = []
+        predicted = {}
+
         metrics = {}
         nlgeval = NLGEval()  # loads the models
         # ifi ==3 ver se dá
@@ -30,8 +32,15 @@ class EvaluatorIndividualMetrics():
             #print("how this is the caption", text_generated)
             # scores = self.compare_results(
             #     references_captions_of_image, text_generated)
-            predicted.append(text_generated)
+
+            (text_generated)
             scores = self.compare_results(nlgeval, references, text_generated)
+
+            predicted[img_name] = {
+                "value": text_generated,
+                "scores": scores
+            }
+
             for metric, score in scores.items():
                 if metric not in metrics:
                     metrics[metric] = score
@@ -39,10 +48,35 @@ class EvaluatorIndividualMetrics():
                     metrics[metric] += score
             n_comparations += 1
 
+            if n_comparations > 5:
+                break
+
         avg_metrics = {metric: total_score /
                        n_comparations for metric, total_score in metrics.items()}
 
-        return avg_metrics
+        avg_results = {}
+        for image, dict_value_scores in predicted.items():
+            scores = dict_value_scores["scores"]
+            for metric, score in scores.items():
+                if metric not in avg_results:
+                    avg_results[metric] = score
+                else:
+                    avg_results[metric] += score
+
+        predicted['avg_metrics'] = {
+            "value": "",
+            "scores": avg_metrics
+        }
+
+        predicted['avg_metrics2'] = {
+            "value": "",
+            "scores": avg_results
+        }
+
+        print("are the same avg_metrics, ", avg_metrics)
+        print("are the same avg_metrics2, ", avg_results)
+
+        return predicted
 
     def compare_results(self, nlgeval, references_captions, predicted_captions):
         print("ref", references_captions)
