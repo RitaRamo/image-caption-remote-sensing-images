@@ -147,18 +147,18 @@ class BasicModel(AbstractModel):
 
         input_caption = np.zeros((1, self.max_len-1))
 
-        decoder_sentence = ""
+        decoder_sentence = START_TOKEN + " "
 
         input_caption[:, 0] = self.token_to_id[START_TOKEN]
         i = 1
         while True:  # change to for!
-            print("\ncurretn input", input_caption)
+            #print("\ncurretn input", input_caption)
 
             outputs_tokens = self.model.predict(
                 [input_image, input_caption])
             current_output_index = np.argmax(outputs_tokens[0, i-1])
             current_output_token = self.id_to_token[current_output_index]
-            print("token", current_output_token)
+            #print("token", current_output_token)
 
             decoder_sentence += " " + current_output_token
 

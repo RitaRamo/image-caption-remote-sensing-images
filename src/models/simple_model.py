@@ -10,7 +10,7 @@ import spacy
 
 class SimpleModel(AbstractModel):
 
-    MODEL_DIRECTORY = "././experiments/results/SimpleModel/"
+    MODEL_DIRECTORY = "././experiments/results/BasicModel/"
 
     def __init__(
         self,
@@ -22,10 +22,10 @@ class SimpleModel(AbstractModel):
         encoder_input_size,
         embedding_type=None,
         embedding_size=300,
-        lstm_units=256
+        units=256
     ):
         super().__init__(args, vocab_size, max_len, token_to_id, id_to_token,
-                         encoder_input_size, embedding_type, embedding_size, lstm_units)
+                         encoder_input_size, embedding_type, embedding_size, units)
         self.model = None
 
     def create(self):
@@ -38,17 +38,17 @@ class SimpleModel(AbstractModel):
         # Input(shape=(None, max_len-1)) #-1 since we cut the train_caption_input[:-1]; and shift to train_target[1:]
         inputs2_captions = Input(shape=(self.max_len-1), name='input_2')
         outputs = self._get_decoder_outputs(inputs2_captions, encoder_state)
-        # Todo: por time-distributed!!
+
         self.model = Model(
             inputs=[input1_images, inputs2_captions], outputs=outputs)
 
     def _get_encoder_state(self, input1_images):
         return Dense(
-            self.lstm_units, activation="relu")(input1_images)
+            self.units, activation="relu")(input1_images)
 
     def _get_decoder_outputs(self, inputs2_captions, encoder_state):
         words_embeddings = self._get_embedding_layer()(inputs2_captions)
-        decoder_hiddens = LSTM(self.lstm_units, return_sequences=True)(
+        decoder_hiddens = LSTM(self.units, return_sequences=True)(
             words_embeddings, initial_state=[encoder_state, encoder_state])
         outputs = TimeDistributed(
             Dense(self.vocab_size, activation='softmax'))(decoder_hiddens)
@@ -116,18 +116,18 @@ class SimpleModel(AbstractModel):
 
         input_caption = np.zeros((1, self.max_len-1))
 
-        decoder_sentence = ""
+        decoder_sentence = START_TOKEN + " "
 
         input_caption[:, 0] = self.token_to_id[START_TOKEN]
         i = 1
-        while True:
-            print("\ncurretn input", input_caption)
+        while True:  # change to for!
+            #print("\ncurretn input", input_caption)
 
             outputs_tokens = self.model.predict(
                 [input_image, input_caption])
             current_output_index = np.argmax(outputs_tokens[0, i-1])
             current_output_token = self.id_to_token[current_output_index]
-            print("token", current_output_token)
+            #print("token", current_output_token)
 
             decoder_sentence += " " + current_output_token
 
