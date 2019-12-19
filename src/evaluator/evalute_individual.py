@@ -48,36 +48,15 @@ class EvaluatorIndividualMetrics():
                     metrics[metric] += score
             n_comparations += 1
 
-            if n_comparations > 5:
-                break
-
         avg_metrics = {metric: total_score /
                        n_comparations for metric, total_score in metrics.items()}
-
-        avg_results = {}
-        for image, dict_value_scores in predicted.items():
-            scores = dict_value_scores["scores"]
-            for metric, score in scores.items():
-                if metric not in avg_results:
-                    avg_results[metric] = score
-                else:
-                    avg_results[metric] += score
-
-        avg_results = {metric: total_score /
-                       n_comparations for metric, total_score in avg_results.items()}
 
         predicted['avg_metrics'] = {
             "value": "",
             "scores": avg_metrics
         }
 
-        predicted['avg_metrics2'] = {
-            "value": "",
-            "scores": avg_results
-        }
-
-        print("are the same avg_metrics, ", avg_metrics)
-        print("are the same avg_metrics2, ", avg_results)
+        print("avg_metrics", avg_metrics)
 
         return predicted
 
