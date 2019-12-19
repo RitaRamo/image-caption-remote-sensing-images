@@ -55,7 +55,7 @@ class FeaturesExtractedSimpleGenerator(Generator):
     def get_image(self, img_name):
         features = self.images_features[img_name]
         # [0] to remove first dim [1, 64, 2048] -> [64, 2048]
-        # return features[0]
+        return features[0]
 
-        img_tensor = tf.reshape(features, [-1])
-        return img_tensor
+        # img_tensor = tf.reshape(features, [-1])
+        # return img_tensor
