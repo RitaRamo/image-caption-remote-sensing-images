@@ -63,6 +63,9 @@ class EvaluatorIndividualMetrics():
                 else:
                     avg_results[metric] += score
 
+        avg_results = {metric: total_score /
+                       n_comparations for metric, total_score in avg_results.items()}
+
         predicted['avg_metrics'] = {
             "value": "",
             "scores": avg_metrics
