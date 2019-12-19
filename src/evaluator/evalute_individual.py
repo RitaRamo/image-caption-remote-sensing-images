@@ -61,7 +61,7 @@ class EvaluatorIndividualMetrics():
         return predicted
 
     def compare_results(self, nlgeval, references_captions, predicted_captions):
-        print("ref", references_captions)
+        print("\nref", references_captions)
         print("caption", predicted_captions)
 
         metrics_dict = nlgeval.compute_individual_metrics(
