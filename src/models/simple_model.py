@@ -10,7 +10,7 @@ import spacy
 
 class SimpleModel(AbstractModel):
 
-    MODEL_DIRECTORY = "././experiments/results/BasicModel/"
+    MODEL_DIRECTORY = "././experiments/results/SimpleModel/"
 
     def __init__(
         self,
