@@ -1,0 +1,7 @@
+--file_name
+FE_A_BM.txt
+--model_class_str
+BasicModel
+--augment_data
+--embedding_type
+glove
