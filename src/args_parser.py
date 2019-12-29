@@ -10,8 +10,8 @@ def get_args():
     parser.add_argument(
         '--model_class_str', help='class name of the model to train', default="SimpleModel")
 
-    parser.add_argument('--image_model_type', type=str, default=ImageNetModelsPretrained.INCEPTION_V3.value,
-                        choices=[model.value for model in ImageNetModelsPretrained])
+    # parser.add_argument('--image_model_type', type=str, default=ImageNetModelsPretrained.INCEPTION_V3.value,
+    #                     choices=[model.value for model in ImageNetModelsPretrained])
 
     parser.add_argument('--epochs', type=int, default=33,
                         help='define epochs to train the model')
