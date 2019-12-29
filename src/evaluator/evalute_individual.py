@@ -33,7 +33,7 @@ class EvaluatorIndividualMetrics():
         for img_name, references in test_dataset.items():
 
             img_tensor = self.generator.get_image(img_name)
-            #img_tensor = tf.expand_dims(img_tensor, axis=0)
+            img_tensor = tf.expand_dims(img_tensor, axis=0)
 
             text_generated = self.model.generate_text(
                 img_tensor)
