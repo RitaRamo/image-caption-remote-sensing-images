@@ -20,13 +20,9 @@ def preprocess_image_inception(img):  # according to inception
 
 def preprocess_image(img, model_type):
     if model_type == ImageNetModelsPretrained.INCEPTION_V3.value:
-        logging.info("preprocess image with inception model")
-
         img = tf.image.resize(img, (299, 299))
         img = tf.keras.applications.inception_v3.preprocess_input(img)
     else:
-        logging.info("preprocess image with densenet model")
-
         img = tf.image.resize(img, (224, 224))
         img = tf.keras.applications.densenet.preprocess_input(img)
 
