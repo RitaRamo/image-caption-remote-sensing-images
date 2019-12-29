@@ -8,19 +8,20 @@ import tensorflow as tf
 from sklearn.utils import shuffle
 from tqdm import tqdm
 
-from generators.abstract_generator import IMAGE_PATH, PATH, Generator
+from generators.abstract_generator import PATH, Generator  # IMAGE_PATH
 from preprocess_data.images import load_image
 
 
 class FineTunedGenerator(Generator):
 
-    def __init__(self, raw_dataset):
-        super().__init__(raw_dataset)
+    def __init__(self, raw_dataset, image_model_type):
+        super().__init__(raw_dataset, image_model_type)
         self.dict_name_img = self.get_images_loaded(
             raw_dataset,
             file_of_dumped_features="src/generators/loaded_image_features.pkl")
 
-    def get_images_loaded(self, raw_dataset, file_of_dumped_features="", path=PATH+IMAGE_PATH):
+    # +IMAGE_PATH):
+    def get_images_loaded(self, raw_dataset, file_of_dumped_features="", path=PATH):
         if os.path.exists(file_of_dumped_features):
             return load(open(file_of_dumped_features, 'rb'))
         else:
