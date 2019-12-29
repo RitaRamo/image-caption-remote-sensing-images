@@ -1,0 +1,9 @@
+--file_name
+FE_A_BM_EG_dense.txt
+--model_class_str
+BasicModel
+--augment_data
+--embedding_type
+glove
+--image_model_type
+densenet
