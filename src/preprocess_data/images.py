@@ -2,6 +2,7 @@ import tensorflow as tf
 from enum import Enum
 import numpy as np
 from scipy.interpolate import UnivariateSpline
+import logging
 
 
 def load_image(image_path):
@@ -17,9 +18,50 @@ def preprocess_image_inception(img):  # according to inception
     return img
 
 
+def preprocess_image(img, model_type):
+    if model_type == ImageNetModelsPretrained.INCEPTION_V3.value:
+        logging.info("preprocess image with inception model")
+
+        img = tf.image.resize(img, (299, 299))
+        img = tf.keras.applications.inception_v3.preprocess_input(img)
+    else:
+        logging.info("preprocess image with densenet model")
+
+        img = tf.image.resize(img, (224, 224))
+        img = tf.keras.applications.densenet.preprocess_input(img)
+
+    img = tf.expand_dims(img, 0)
+    return img
+
+
 def get_inception_pretrained():
     image_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
                                                     weights='imagenet')
+    new_input = image_model.input
+    hidden_layer = image_model.layers[-1].output
+
+    extractor_features_model = tf.keras.Model(new_input, hidden_layer)
+
+    return extractor_features_model
+
+
+class ImageNetModelsPretrained(Enum):
+    INCEPTION_V3 = "inception"
+    DENSENET = "densenet"
+
+
+def get_extractor_features_model(model_type):
+    if model_type == ImageNetModelsPretrained.INCEPTION_V3.value:
+        logging.info("extract features with inception model")
+
+        image_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
+                                                        weights='imagenet')
+    else:
+        logging.info("extract features with densenet model")
+
+        image_model = tf.keras.applications.densenet.DenseNet201(
+            include_top=False, weights='imagenet')
+
     new_input = image_model.input
     hidden_layer = image_model.layers[-1].output
 
