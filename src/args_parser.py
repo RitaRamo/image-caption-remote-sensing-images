@@ -22,8 +22,8 @@ def get_args():
     parser.add_argument('--disable_steps', action='store_true', default=False,
                         help='Conf just for testing: make the model run only 1 steps instead of the steps that was supposed')
 
-    parser.add_argument('--disable_metrics', action='store_true', default=False,
-                        help='Conf just for testing: make the model does not run the metrics')
+    # parser.add_argument('--disable_metrics', action='store_true', default=False,
+    #                     help='Conf just for testing: make the model does not run the metrics')
 
     parser.add_argument(
         '--embedding_type', help='embedding type (glove,spacy or None)', default=None)

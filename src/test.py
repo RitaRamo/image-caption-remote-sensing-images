@@ -62,6 +62,6 @@ if __name__ == "__main__":
     evaluator = EvaluatorIndividualMetrics(
         generator, model)  # Evaluator(generator, model)
 
-    scores = evaluator.evaluate(test_dataset, args.disable_metrics)
+    scores = evaluator.evaluate(test_dataset, False)  # args.disable_metrics)
 
     model.save_scores(scores)
