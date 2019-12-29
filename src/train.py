@@ -34,6 +34,8 @@ from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 os.environ['PYTHONHASHSEED'] = '0'
+
+
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 
@@ -87,16 +89,17 @@ if __name__ == "__main__":
     train_generator = None
     val_generator = None
 
+    generator_args = (raw_dataset, args.image_model_type)
     if args.fine_tuning:
         logging.info("Fine Tuning")
 
         if args.augment_data:
             logging.info("with augmented images")
-            generator = FineTunedAugmentedGenerator(raw_dataset)
+            generator = FineTunedAugmentedGenerator(*generator_args)
 
         else:
             logging.info("without augmented images")
-            generator = FineTunedSimpleGenerator(raw_dataset)
+            generator = FineTunedSimpleGenerator(*generator_args)
 
     else:
         logging.info("Feature extraction")
@@ -104,12 +107,12 @@ if __name__ == "__main__":
         if args.augment_data:
             logging.info("with augmented images")
 
-            generator = FeaturesExtractedAugmentedGenerator(raw_dataset)
+            generator = FeaturesExtractedAugmentedGenerator(*generator_args)
 
         else:
             logging.info("without augmented images")
 
-            generator = FeaturesExtractedSimpleGenerator(raw_dataset)
+            generator = FeaturesExtractedSimpleGenerator(*generator_args)
 
     logging.info("create generators for datasets (train and val)")
 
@@ -126,6 +129,8 @@ if __name__ == "__main__":
         val_target_captions,
         vocab_size
     )
+
+    #TODO: SUFFLE
 
     train_dataset = tf.data.Dataset.from_generator(
         lambda: train_generator,
@@ -187,21 +192,6 @@ if __name__ == "__main__":
                 len(train_images_names), len(val_images_names))
 
     model.save()
-
-    img_name = train_images_names[0]
-    its_caption = train_images_names[0]
-    logging.info("any image %s", img_name)
-    # logging.info("pois esta é a caption", its_caption)
-
-    # features = images_features[img_name]
-    # img_tensor = tf.reshape(features, [-1])
-    # logging.info("img_tensor shape %s", np.shape(img_tensor))
-    # logging.info("with expa %s", tf.expand_dims(
-    #     img_tensor, axis=0))
-
-    # logging.info("vamos tentar o new model %s", model.generate_text(
-    #     tf.expand_dims(
-    #         img_tensor, axis=0), token_to_id, id_to_token))
 
 
 # Por a correr online (scp) [GOAL:hoje!!!]

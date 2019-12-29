@@ -38,8 +38,6 @@ class BahdanauAttention(tf.keras.Model):
     def call(self, features, hidden):
         # features(CNN_encoder output) shape == (batch_size, features_shape0, embedding_dim)
         # ex: for inception (batch_size, 64, embedding_dim)
-        print("f shape", features)
-        print("hidden shape", hidden)
 
         # hidden shape == (batch_size, hidden_size/dec_units)
         # hidden_with_time_axis shape == (batch_size, 1, hidden_size/dec_units)
@@ -47,7 +45,7 @@ class BahdanauAttention(tf.keras.Model):
 
         # self.W1(features) shape ==  (batch_size, features_shape0, hidden_size/units)
         # self.W2(hidden_with_time_axis) shape ==  (batch_size, 1, hidden_size/units)
-        # tf.nn.tanh(self.W1(features) + self.W2(hidden_with_time_axis)) shape == (batch_size, 64, hidden_size)  [hidden_size==units]
+        # tf.nn.tanh(self.W1(features) + self.W2(hidden_with_time_axis)) shape == (batch_size, features_shape0, hidden_size)  [hidden_size==units]
         # score shape with self.V == (batch_size, features_shape0,1) ex: for inception (batch_size, 64, 1)
         score = self.V(tf.nn.tanh(self.W1(features) +
                                   self.W2(hidden_with_time_axis)))
@@ -59,10 +57,9 @@ class BahdanauAttention(tf.keras.Model):
         # context_vector shape == (batch_size, feature_shape0, features_shape1[enc_embedding])
         # it could be shape == (batch_size, feature_shape0, hidden_size, if enc_embedding == dec_unit)
         context_vector = attention_weights * features
-        print("no shape", np.shape(context_vector))
 
-        # context_vector shape after sum == (batch_size, features_shape1 [enc_embedding])
-        # it could be shape == (batch_size,  hidden_size, if enc_embedding == dec_unit)
+        # context_vector shape after sum == (batch_size, features_shape1/enc_embedding)
+        # it could be shape == (batch_size,  hidden_size) if enc_embedding == hidden_size/dec_unit)
         context_vector = tf.reduce_sum(context_vector, axis=1)
 
         return context_vector, attention_weights
@@ -227,4 +224,4 @@ class AttentionModel(AbstractModel):
                 time.time() - start))
 
             # TODO: do same logic but for validation!!
-            # TODO: try to do early step
+            # TODO: try to do early stop

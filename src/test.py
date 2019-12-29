@@ -35,14 +35,16 @@ if __name__ == "__main__":
     test_dataset = get_dataset(
         "src/datasets/RSICD/dataset/test.json")
 
+    generator_args = (raw_dataset, args.image_model_type)
+
     if args.fine_tuning:
         logging.info("fine tuning")
-        generator = FineTunedSimpleGenerator(raw_dataset)
+        generator = FineTunedSimpleGenerator(*generator_args)
 
     else:
         logging.info("feature extraction")
 
-        generator = FeaturesExtractedSimpleGenerator(raw_dataset)
+        generator = FeaturesExtractedSimpleGenerator(*generator_args)
 
     model_class = globals()[args.model_class_str]
 
@@ -60,8 +62,6 @@ if __name__ == "__main__":
     evaluator = EvaluatorIndividualMetrics(
         generator, model)  # Evaluator(generator, model)
 
-    scores = evaluator.evaluate(test_dataset)
-
-    #print("this are the scores", scores)
+    scores = evaluator.evaluate(test_dataset, args.disable_metrics)
 
     model.save_scores(scores)
