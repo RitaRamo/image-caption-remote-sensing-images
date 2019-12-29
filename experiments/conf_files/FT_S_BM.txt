@@ -1,4 +1,5 @@
 --file_name
-FE_S_BM.txt
+FT_S_BM.txt
 --model_class_str
 BasicModel
+--fine_tuning

@@ -1,5 +1,5 @@
 --file_name
-FE_A_BM.txt
+FE_A_BM_EG.txt
 --model_class_str
 BasicModel
 --augment_data
