@@ -7,7 +7,7 @@ import numpy as np
 import tensorflow as tf
 import time
 from preprocess_data.tokens import START_TOKEN, END_TOKEN
-
+import logging
 # This attention model has the first state of decoder all zeros (and not receiving the encoder states as initial state)
 # Shape of the vector extracted from InceptionV3 is (64, 2048)
 
@@ -86,6 +86,9 @@ class Decoder(tf.keras.Model):
             vocab_size, activation="softmax")
 
     def call(self, x, encoder_features, dec_hidden):
+        #print("np shape x", np.shape(x))
+        #print("np shape encoder_features", np.shape(encoder_features))
+        #print("np shape dec_hidden", np.shape(dec_hidden))
 
         # defining attention as a separate model
         context_vector, attention_weights = self.attention(
@@ -153,8 +156,23 @@ class AttentionModel(AbstractModel):
 
     def save(self):
         pass
-        # self.model.save(self.get_path())
 
+    def load(self):
+        self.create()
+        self.optimizer = tf.keras.optimizers.Adam()
+
+        # self.build()
+        #self.model = tf.keras.models.load_model(self.get_path())
+        ckpt = tf.train.Checkpoint(
+            optimizer=self.optimizer, encoder=self.encoder, decoder=self.decoder)
+        ckpt_manager = tf.train.CheckpointManager(
+            ckpt, self.get_path(), max_to_keep=2)
+
+        ckpt.restore(ckpt_manager.latest_checkpoint)
+        if ckpt_manager.latest_checkpoint:
+            logging.info("Restore model from checkpoint")
+
+    @tf.function
     def train_step(self, img_tensor, input_caption_seq,  target_caption_seq):
 
         loss = 0
@@ -169,7 +187,6 @@ class AttentionModel(AbstractModel):
             encoder_features = self.encoder(img_tensor)
 
             for i in range(n_tokens):
-
                 predicted_output, dec_hidden, attention_weights = self.decoder(
                     input_caption_seq[:, i], encoder_features, dec_hidden)
                 loss += self.crossentropy(
@@ -187,6 +204,15 @@ class AttentionModel(AbstractModel):
         return batch_loss
 
     def train(self, train_dataset, val_dataset, len_train_dataset, len_val_dataset):
+        ckpt = tf.train.Checkpoint(
+            optimizer=self.optimizer, encoder=self.encoder, decoder=self.decoder)
+        ckpt_manager = tf.train.CheckpointManager(
+            ckpt, self.get_path(), max_to_keep=2)
+
+        start_epoch = 0
+        ckpt.restore(ckpt_manager.latest_checkpoint)
+        if ckpt_manager.latest_checkpoint:
+            start_epoch = int(ckpt_manager.latest_checkpoint.split('-')[-1])
 
         if self.args.disable_steps:
             train_steps = 1
@@ -195,7 +221,7 @@ class AttentionModel(AbstractModel):
             train_steps = int(len_train_dataset/self.args.batch_size)
             val_steps = int(len_val_dataset/self.args.batch_size)
 
-        for epoch in range(self.args.epochs):
+        for epoch in range(start_epoch, self.args.epochs):
             start = time.time()
             total_loss = 0
 
@@ -217,11 +243,77 @@ class AttentionModel(AbstractModel):
                     epoch, i, batch_loss))
                 i += 1
 
+            ckpt_manager.save()
+
             epoch_loss = total_loss/train_steps
-            tf.print('Epoch {} Loss {:.6f}'.format(epoch,
-                                                   total_loss/train_steps))  # N_BATCH -> n_steps
+            tf.print('Epoch {} Loss {:.4f}'.format(epoch,
+                                                   epoch_loss))  # N_BATCH -> n_steps
             tf.print('Time taken for 1 epoch {} sec\n'.format(
                 time.time() - start))
 
-            # TODO: do same logic but for validation!!
-            # TODO: try to do early stop
+            # VALIDATION!
+            total_loss = 0
+
+            for batch_samples in val_dataset.take(val_steps):
+                images_tensor = batch_samples[0]["input_1"]
+                input_caption_seq = batch_samples[0]["input_2"]
+                target_caption_seq = batch_samples[1]
+
+                loss = 0
+                dec_hidden = tf.zeros((self.args.batch_size, self.units))
+
+                # max_len -1 since the input_seq has max_len -1 (without end token)
+                # and target_sentence is max_len -1 (without start token)
+                n_tokens = self.max_len-1
+
+                encoder_features = self.encoder(images_tensor)
+
+                for i in range(n_tokens):
+
+                    predicted_output, dec_hidden, _ = self.decoder(
+                        input_caption_seq[:, i], encoder_features, dec_hidden)
+                    loss += self.crossentropy(
+                        target_caption_seq[:, i], predicted_output)
+
+                batch_loss = (loss / n_tokens)
+                total_loss += batch_loss
+
+            epoch_loss = total_loss/val_steps
+            tf.print('Val Loss {:.4f}'.format(
+                epoch_loss))  # N_BATCH -> n_steps
+
+    def generate_text(self, input_image):
+        input_caption = np.zeros((1, self.max_len-1))
+
+        decoder_sentence = START_TOKEN + " "
+
+        input_caption = np.array([self.token_to_id[START_TOKEN]])
+
+        i = 1
+
+        dec_hidden = tf.zeros((self.args.batch_size, self.units))
+
+        while True:  # change to for!
+            encoder_features = self.encoder(input_image)
+
+            predicted_output, dec_hidden, attention_weights = self.decoder(
+                input_caption, encoder_features, dec_hidden)
+
+            current_output_index = np.argmax(predicted_output)
+            current_output_token = self.id_to_token[current_output_index]
+
+            decoder_sentence += " " + current_output_token
+
+            decoder_sentence += " " + current_output_token
+
+            if (current_output_token == END_TOKEN or
+                    i >= self.max_len-1):  # chegas ao 35
+                break
+
+            input_caption[0] = current_output_index
+
+            i += 1
+
+        print("decoded sentence", decoder_sentence)
+
+        return decoder_sentence  # input_caption
