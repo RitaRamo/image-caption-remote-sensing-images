@@ -20,7 +20,6 @@ class FineTunedGenerator(Generator):
             raw_dataset,
             file_of_dumped_features="src/generators/loaded_image_features.pkl")
 
-    # +IMAGE_PATH):
     def get_images_loaded(self, raw_dataset, file_of_dumped_features="", path=PATH):
         if os.path.exists(file_of_dumped_features):
             return load(open(file_of_dumped_features, 'rb'))
@@ -35,6 +34,7 @@ class FineTunedGenerator(Generator):
                 dict_name_img[img_filename] = img_loaded
 
             return dict_name_img
+
 
     @abstractmethod
     def get_image(self, img):

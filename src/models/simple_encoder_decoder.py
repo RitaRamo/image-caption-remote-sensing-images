@@ -1,6 +1,6 @@
 import tensorflow as tf
 from models.abstract_model import AbstractModel
-
+import numpy as np
 # TODO: por mask!!
 # TODO: por save() -> como defines isso??
 
@@ -15,7 +15,11 @@ class Encoder(tf.keras.Model):
     def call(self, images_features):
         # inception
         # reshape
-        output = self.dense(images_features)
+        shape = images_features.get_shape().as_list()
+        dim = np.prod(shape[1:])
+        input1_images = tf.reshape(images_features, [-1, dim])
+
+        output = self.dense(input1_images)
         return output
 
 
@@ -43,16 +47,37 @@ class Decoder(tf.keras.Model):
 
 class SimpleEncoderDecoderModel(AbstractModel):
 
-    def __init__(self, vocab_size, max_len, encoder_input_size=131072, lstm_units=256, embedding_size=300):
-        super().__init__(vocab_size, max_len, encoder_input_size, lstm_units, embedding_size)
+    def __init__(
+        self,
+        args,
+        vocab_size,
+        max_len,
+        token_to_id,
+        id_to_token,
+        encoder_input_size,
+        embedding_type=None,
+        embedding_size=300,
+        units=256
+    ):
+        super().__init__(args, vocab_size, max_len, token_to_id, id_to_token,
+                         encoder_input_size, embedding_type, embedding_size, units)
+        self.model = None
+
         self.optimizer = tf.keras.optimizers.Adam()
-        self.encoder = Encoder(lstm_units)
-        self.decoder = Decoder(vocab_size, embedding_size, lstm_units)
+
+        self.encoder = Encoder(units)
+        self.decoder = Decoder(vocab_size, embedding_size, units)
 
     def create(self):
         pass
 
     def build(self):
+        pass
+
+    def summary(self):
+        pass
+
+    def save(self):
         pass
 
     def loss_func(self, targets, predicted):
@@ -85,7 +110,6 @@ class SimpleEncoderDecoderModel(AbstractModel):
 
         NUM_EPOCHS = 2
         for e in range(NUM_EPOCHS):
-            print("entrei")
             for batch, batch_samples in enumerate(train_dataset):
                 images = batch_samples[0]["input_1"]
                 input_caption_seq = batch_samples[0]["input_2"]

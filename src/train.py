@@ -21,6 +21,7 @@ from generators.features_extracted.simple_generator import \
     FeaturesExtractedSimpleGenerator
 from generators.fine_tuned.simple_generator import FineTunedSimpleGenerator
 from models.simple_encoder_decoder import SimpleEncoderDecoderModel
+from models.simple_e_d import SimpleEncoderDecoder
 from models.simple_model import SimpleModel
 from models.basic_model import BasicModel
 from models.attention_model import AttentionModel

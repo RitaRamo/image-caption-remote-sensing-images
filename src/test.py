@@ -12,6 +12,7 @@ from models.simple_model import SimpleModel
 from models.basic_model import BasicModel
 
 from models.simple_model_finetuning import SimpleFineTunedModel
+from models.attention_model import AttentionModel
 
 
 import os
