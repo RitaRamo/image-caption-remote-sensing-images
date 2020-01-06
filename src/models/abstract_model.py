@@ -86,7 +86,7 @@ class AbstractModel(ABC):
 
         check_callback = CheckCallback(ckpt_manager)
 
-        self.model.fit_generator(
+        self.model.fit(
             train_dataset,
             epochs=self.args.epochs,
             steps_per_epoch=train_steps,
