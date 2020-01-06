@@ -1,0 +1,9 @@
+--file_name
+FE_A_BM_EG_300emb.txt
+--model_class_str
+BasicModel
+--augment_data
+--embedding_type
+glove
+--batch_size
+8

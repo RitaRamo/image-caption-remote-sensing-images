@@ -55,6 +55,7 @@ class BasicModel(AbstractModel):
                 self.units, activation="relu")(input1_images)
 
         else:  # fine_tuning:
+            # TODO: MUDA -> AQUI
             base_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
                                                            weights='imagenet')
             new_input = base_model.input
@@ -94,8 +95,8 @@ class BasicModel(AbstractModel):
 
         if self.embedding_type == "glove":
 
-            glove_path = 'src/models/glove.6B/glove.6B.50d.txt'
-            self.embedding_size = 50
+            glove_path = 'src/models/glove.6B/glove.6B.300d.txt'
+            self.embedding_size = 300
 
             def read_glove_vectors(path, lenght):
                 embeddings = {}
@@ -174,8 +175,8 @@ class BasicModel(AbstractModel):
             # enviar esse input, agora tens i=35
             # foi para o outro em 34
 
-            #         [start]
-            # [-, , ] [start,-,...]  input[1]=pos_0
+            # input:  [start, ,]
+            # output: [-, , ] prox_input:[start,-,...]  input[1]=pos_0
 
             # [-,--,] [start,-,--] input[2]=pos_1
             # (stop dedar ao input) 3; aos 2 paras
@@ -205,104 +206,36 @@ class BasicModel(AbstractModel):
 
         return decoder_sentence  # , input_caption
 
-    # def generate_text2(self, input_image, token_to_id, id_to_token):
-    #     if self.model is None:
-    #         self.load()
+    def generate_text2(self, input_image):
+        if self.model is None:
+            self.load()
+        # self.model.load_weights("simple_model-weights.h5")
 
-    #     print("model layers", self.model.layers)
+        input_caption = np.zeros((1, self.max_len-1))
 
-    #     encoder_inputs = self.model.input[0]   # input_1
-    #     encoder_features = self.model.layers[3](encoder_inputs)   # dense
-    #     encoder_states = [encoder_features, encoder_features]
+        decoder_sentence = START_TOKEN + " "
 
-    #     encoder_model = Model(encoder_inputs, encoder_states)
-    #     print("entrei aqui no encoder")
+        input_caption[:, 0] = self.token_to_id[START_TOKEN]
+        i = 1
+        while True:  # change to for!
+            #print("\ncurretn input", input_caption)
 
-    #     decoder_inputs = self.model.input[1]   # input_2
-    #     # what is latent dim
-    #     decoder_state_input_h = Input(shape=(256,), name='input_3')
-    #     decoder_state_input_c = Input(shape=(256,), name='input_4')
+            outputs_tokens = self.model.predict(
+                [input_image, input_caption])
+            current_output_index = np.argmax(outputs_tokens[0, i-1])
+            current_output_token = self.id_to_token[current_output_index]
+            #print("token", current_output_token)
 
-    #     embeddings_layer = self.model.layers[2]
-    #     embeddings = embeddings_layer(decoder_inputs)
+            decoder_sentence += " " + current_output_token
 
-    #     decoder_states_inputs = [decoder_state_input_h, decoder_state_input_c]
-    #     decoder_lstm = self.model.layers[4]
-    #     print("this is decoder lstm", decoder_lstm)
+            if (current_output_token == END_TOKEN or
+                    i >= self.max_len-1):  # chegas ao 35
+                break
 
-    #     print("embeddin", embeddings)
-    #     print("decoder_states_inputs", decoder_states_inputs)
-    #     print("separed", decoder_state_input_h)
+            input_caption[0, i] = current_output_index
 
-    #     decoder_outputs, state_h_dec, state_c_dec = decoder_lstm(
-    #         embeddings, initial_state=decoder_states_inputs)
+            i += 1
 
-    #     decoder_states = [state_h_dec, state_c_dec]
+        print("decoded sentence", decoder_sentence)
 
-    #     decoder_dense = self.model.layers[5]
-    #     decoder_outputs = decoder_dense(decoder_outputs)
-
-    #     decoder_model = Model(
-    #         [decoder_inputs] + decoder_states_inputs,
-    #         [decoder_outputs] + decoder_states)
-
-    #     # Começar aqui!!
-    #     print("vou comecar ")
-
-    #     states_value = encoder_model.predict(input_image)
-
-    #     # Generate empty target sequence of length 1.
-    #     input_caption = np.zeros((1, self.max_len))
-    #     print("my initial shape", np.shape(input_caption))
-
-    #     input_caption[0, 0] = token_to_id[START_TOKEN]  # start seq
-
-    #     #start + pading
-
-    #     # Sampling loop for a batch of sequences
-    #     # (to simplify, here we assume a batch of size 1).
-    #     stop_condition = False
-    #     decoded_sentence = ''
-    #     i = 1
-    #     while not stop_condition:
-    #         print("entrei no while")
-
-    #         output_tokens, h, c = decoder_model.predict(
-    #             [input_caption] + states_value)
-
-    #         # cuidad
-    #         outputs_tokens_model = self.model.predict(
-    #             [input_image, input_caption])
-    #         current_output_index = np.argmax(outputs_tokens_model[0, i])
-
-    #         current_output_token = id_to_token[current_output_index]
-    #         print("\n outro model generated", current_output_token)
-    #         print("o outro model genera", current_output_index)
-
-    #         # Sample a token
-    #         sampled_token_index = np.argmax(output_tokens[0, i])
-    #         print("este sampled_token_index", sampled_token_index)
-
-    #         sampled_token = id_to_token[sampled_token_index]
-    #         print("este token", sampled_token)
-
-    #         decoded_sentence += " " + sampled_token
-
-    #         # Exit condition: either hit max length
-    #         # or find stop character.
-    #         if (sampled_token == END_TOKEN or
-    #                 i >= self.max_len-1):
-    #             stop_condition = True
-
-    #         input_caption[0, i] = sampled_token_index
-    #         print("how it torned out", input_caption)
-
-    #         i += 1
-
-    #         # Update states
-    #         # states_value = [h, c] -> fica igual ao de baixo, pq tas a enviar a frase toda, se enviasses so a palavra tinahs
-    #         # de actualizar manualmente assim com states_values, step a step!
-
-    #     print("\n final decoded", decoded_sentence)
-
-    #     return decoded_sentence, input_caption
+        return decoder_sentence  # , input_caption
