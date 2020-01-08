@@ -6,7 +6,7 @@ from tensorflow.keras.models import Model
 import numpy as np
 import tensorflow as tf
 import time
-from preprocess_data.tokens import START_TOKEN, END_TOKEN
+from preprocess_data.tokens import START_TOKEN, END_TOKEN, PAD_TOKEN
 
 # This attention model has the first state of decoder all zeros (and not receiving the encoder states as initial state)
 # Shape of the vector extracted from InceptionV3 is (64, 2048)
@@ -99,6 +99,49 @@ class SimpleEncoderDecoder(AbstractModel):
         self.crossentropy = tf.keras.losses.CategoricalCrossentropy()
         self.optimizer = tf.keras.optimizers.Adam()
 
+    def loss_function(self, real, pred):
+        print("\n real", real)
+        print("predicted", pred)
+        print("what is the id of padding token", self.token_to_id[PAD_TOKEN])
+
+        # convert what is not padding [!=0] to True, and padding [==0] to false
+        mask = tf.math.logical_not(tf.math.equal(
+            np.argmax(real, axis=1), self.token_to_id[PAD_TOKEN]))  # 5,6,7
+        #mask = tf.math.logical_not(tf.math.equal(real, 0))
+
+        print(" np argmaz real", np.argmax(real, axis=1))
+        print("np shape argmaz real", np.shape(np.argmax(real, axis=1)))
+
+        print("logocial", tf.math.equal(
+            np.argmax(real, axis=1), self.token_to_id[PAD_TOKEN]))
+
+        print("mask", mask)
+        print("np shape mask", mask)
+
+        # alterar: tens que fazer se o teu one-hot-enconding é zero!!!
+
+        # start, end, palavra, padding
+        # False, False, False, True
+
+        # one hot encoding padding: [0,0,0,1]  -> logo tudo é zero, acha q tudo isso é padding...
+        # MUDAR!!
+
+        #True, True, True, False
+        #print("\nnp shape mask", mask)
+
+        loss_ = self.crossentropy(real, pred)
+
+        # converst True and Falses to 0s and 1s
+        mask = tf.cast(mask, dtype=loss_.dtype)
+        # loss is multiplied by masks values (1s and 0s), thus filtering the padding (0)
+        loss_ *= mask
+
+        print("other loss", loss_)
+        print("reduced loss", tf.reduce_mean(loss_))
+
+        # mean/avarage by batch_size
+        return tf.reduce_mean(loss_)
+
     def summary(self):
         pass
 
@@ -110,6 +153,8 @@ class SimpleEncoderDecoder(AbstractModel):
     def train_step(self, img_tensor, input_caption_seq,  target_caption_seq):
 
         loss = 0
+        other_loss = 0
+
         dec_hidden = tf.zeros((self.args.batch_size, self.units))
 
         # max_len -1 since the input_seq has max_len -1 (without end token)
@@ -126,8 +171,13 @@ class SimpleEncoderDecoder(AbstractModel):
                     input_caption_seq[:, i], encoder_features, dec_hidden)
                 loss += self.crossentropy(
                     target_caption_seq[:, i], predicted_output)
+                other_loss += self.loss_function(
+                    target_caption_seq[:, i], predicted_output)
 
         batch_loss = (loss / n_tokens)
+        batch_other_loss = (other_loss / n_tokens)
+        print("this is batch loss", batch_loss)
+        print("this is batch_other_loss", batch_other_loss)
 
         trainable_variables = self.encoder.trainable_variables + \
             self.decoder.trainable_variables
