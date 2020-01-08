@@ -238,16 +238,19 @@ class AttentionEarlyModel(AbstractModel):
         train_steps, val_steps = self._get_steps(
             len_train_dataset, len_val_dataset)
 
+        # TODO: send this outside
         count_without_improvement = 0
-        patient = 0
+        patient = 3
+        _best_val_loss = np.inf
+        min_delta = -0.5
 
         for epoch in range(start_epoch, self.args.epochs):
             start = time.time()
 
-            def calculate_total_loss(train_or_val_dataset, train_or_val_steps, train_or_val_step, epoch=None):
+            def calculate_total_loss(train_or_val_dataset, n_steps, train_or_val_step, epoch=None):
                 total_loss = 0
                 batch_i = 0
-                for batch_samples in train_or_val_dataset.take(train_or_val_steps):
+                for batch_samples in train_or_val_dataset.take(n_steps):
 
                     images_tensor = batch_samples[0]["input_1"]
                     input_caption_seq = batch_samples[0]["input_2"]
@@ -266,7 +269,7 @@ class AttentionEarlyModel(AbstractModel):
             total_loss = calculate_total_loss(
                 train_dataset, train_steps, self.train_step, epoch)
 
-            ckpt_manager.save()
+            # ckpt_manager.save()
 
             epoch_loss = total_loss/train_steps
             tf.print('\nTime taken for 1 epoch {} sec'.format(
@@ -278,15 +281,23 @@ class AttentionEarlyModel(AbstractModel):
             total_loss = calculate_total_loss(
                 val_dataset, val_steps, self.validation_step)
 
-            if total_loss < _best_val_loss:  # improvement
+            print("current val loss", total_loss)
+            print("best val loss", _best_val_loss)
+            print("councount_without_improvement", count_without_improvement)
+
+            if (total_loss - min_delta) < _best_val_loss:  # improvement
                 _best_val_loss = total_loss
                 count_without_improvement = 0
+                ckpt_manager.save()
+                print("saving on epoch", epoch)
                 # save this checkpoint
                 # ckpt_manager.save() #isto n interfere cm os epochs q ele acha q ja treinou?
 
             else:  # No improevement
                 count_without_improvement += 1
-                if count_without_improvement > patient:
+                print("not saving on epoch", epoch)
+                if count_without_improvement >= patient:
+                    print("will stop training")
                     break  # stop training
 
                 # dont save this chekpoint
