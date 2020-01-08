@@ -1,4 +1,5 @@
 from models.abstract_model import AbstractModel
+from models.layers import _get_embedding_layer
 from tensorflow.keras.layers import Input, LSTM, Dense, Embedding, TimeDistributed
 from tensorflow.keras.models import Model
 import numpy as np
@@ -29,6 +30,10 @@ class BasicModel(AbstractModel):
         super().__init__(args, vocab_size, max_len, token_to_id, id_to_token,
                          encoder_input_size, embedding_type, embedding_size, units)
         self.model = None
+
+    def _checkpoint(self):
+        self.checkpoint_path = "./tf_ckpts"
+        return tf.train.Checkpoint(optimizer=self.model.optimizer, model=self.model)
 
     def create(self):
         # Encoder:
@@ -80,64 +85,13 @@ class BasicModel(AbstractModel):
             return encoder_state
 
     def _get_decoder_outputs(self, inputs2_captions, encoder_state):
-        words_embeddings = self._get_embedding_layer()(inputs2_captions)
+        words_embeddings = _get_embedding_layer(
+            self.embedding_type,  self.vocab_size, self.embedding_size, self.token_to_id)(inputs2_captions)
         decoder_hiddens = LSTM(self.units, return_sequences=True, return_state=False)(
             words_embeddings, initial_state=[encoder_state, encoder_state])
         outputs = TimeDistributed(
             Dense(self.vocab_size, activation='softmax'))(decoder_hiddens)
         return outputs
-
-    def _get_embedding_layer(self):
-        if self.embedding_type is None:
-            return Embedding(self.vocab_size, self.embedding_size, mask_zero=True)
-
-        embeddings_matrix = None
-
-        if self.embedding_type == "glove":
-
-            glove_path = 'src/models/glove.6B/glove.6B.300d.txt'
-            self.embedding_size = 300
-
-            def read_glove_vectors(path, lenght):
-                embeddings = {}
-                with open(path) as glove_f:
-                    for line in glove_f:
-                        chunks = line.split()
-                        word = chunks[0]
-                        vector = np.array(chunks[1:])
-                        embeddings[word] = vector
-
-                return embeddings
-
-            glove_embeddings = read_glove_vectors(
-                glove_path, self.embedding_size)
-
-            # Init the embeddings layer with GloVe embeddings
-            embeddings_matrix = np.zeros(
-                (self.vocab_size, self.embedding_size))
-            for word, idx in self.token_to_id.items():
-                try:
-                    embeddings_matrix[idx] = glove_embeddings[word]
-                except:
-                    pass
-
-        elif self.embedding_type == "spacy":
-            nlp = spacy.load('en_core_web_md')
-            self.embedding_size = len(nlp.vocab['apple'].vector)
-
-            embeddings_matrix = np.zeros(
-                (self.vocab_size, self.embedding_size))
-            for word, i in self.token_to_id.items():
-                try:
-                    embeddings_matrix[i] = nlp.vocab[word].vector
-                except:
-                    pass
-
-        return Embedding(self.vocab_size,
-                         self.embedding_size,
-                         mask_zero=True,
-                         weights=[embeddings_matrix],
-                         trainable=False)
 
     # vais dando a lista com todas as palavras até agora, pelo que não precisas de actualizar o state manualmnte
 
