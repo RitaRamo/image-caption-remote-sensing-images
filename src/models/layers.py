@@ -9,6 +9,7 @@ def _get_embedding_layer(embedding_type, vocab_size, embedding_size, token_to_id
         return Embedding(vocab_size, embedding_size, mask_zero=True)
 
     embeddings_matrix = None
+    embedding_size = None
 
     if embedding_type == "glove":
 
