@@ -12,8 +12,8 @@ def _get_embedding_layer(embedding_type, vocab_size, embedding_size, token_to_id
 
     if embedding_type == "glove":
 
-        glove_path = 'src/models/glove.6B/glove.6B.300d.txt'
-        embedding_size = 300
+        glove_path = 'src/models/glove.6B/glove.6B.50d.txt'
+        embedding_size = 50
 
         def read_glove_vectors(path, lenght):
             embeddings = {}
