@@ -4,6 +4,7 @@ import json
 import os
 import logging
 import shutil
+import numpy as np
 
 
 class AbstractModel(ABC):
@@ -61,7 +62,8 @@ class AbstractModel(ABC):
         ckpt.restore(ckpt_manager.latest_checkpoint)
         if ckpt_manager.latest_checkpoint:
             start_epoch = int(ckpt_manager.latest_checkpoint.split('-')[-1])
-            logging.info("Restore model from checkpoint")
+            logging.info(
+                "Restore model from checkpoint. Start epoch %s ", start_epoch)
 
         return ckpt_manager, start_epoch
 
@@ -79,6 +81,7 @@ class AbstractModel(ABC):
         train_steps, val_steps = self._get_steps(
             len_train_dataset, len_val_dataset)
 
+        # TODO: DAR A ultima loss do checkpoint (variable) à baseline :)
         early_stop = tf.keras.callbacks.EarlyStopping(
             monitor='loss',
             patience=3,
@@ -99,6 +102,154 @@ class AbstractModel(ABC):
 
         check_callback = CheckCallback(ckpt_manager)
 
+        # class EarlyStopping(tf.keras.callbacks.Callback):
+        #     """Stop training when a monitored quantity has stopped improving.
+        #     Arguments:
+        #         monitor: Quantity to be monitored.
+        #         min_delta: Minimum change in the monitored quantity
+        #             to qualify as an improvement, i.e. an absolute
+        #             change of less than min_delta, will count as no
+        #             improvement.
+        #         patience: Number of epochs with no improvement
+        #             after which training will be stopped.
+        #         verbose: verbosity mode.
+        #         mode: One of `{"auto", "min", "max"}`. In `min` mode,
+        #             training will stop when the quantity
+        #             monitored has stopped decreasing; in `max`
+        #             mode it will stop when the quantity
+        #             monitored has stopped increasing; in `auto`
+        #             mode, the direction is automatically inferred
+        #             from the name of the monitored quantity.
+        #         baseline: Baseline value for the monitored quantity.
+        #             Training will stop if the model doesn't show improvement over the
+        #             baseline.
+        #         restore_best_weights: Whether to restore model weights from
+        #             the epoch with the best value of the monitored quantity.
+        #             If False, the model weights obtained at the last step of
+        #             training are used.
+        #     Example:
+        #     ```python
+        #     callback = tf.keras.callbacks.EarlyStopping(
+        #         monitor='val_loss', patience=3)
+        #     # This callback will stop the training when there is no improvement in
+        #     # the validation loss for three consecutive epochs.
+        #     model.fit(data, labels, epochs=100, callbacks=[callback],
+        #         validation_data=(val_data, val_labels))
+        #     ```
+        #     """
+
+        #     def __init__(self,
+        #                  monitor='val_loss',
+        #                  min_delta=0,
+        #                  patience=0,
+        #                  verbose=0,
+        #                  mode='auto',
+        #                  baseline=None,
+        #                  restore_best_weights=False):
+        #         super(EarlyStopping, self).__init__()
+
+        #         self.monitor = monitor
+        #         self.patience = patience
+        #         self.verbose = verbose
+        #         self.baseline = baseline
+        #         self.min_delta = abs(min_delta)
+        #         self.wait = 0
+        #         self.stopped_epoch = 0
+        #         self.restore_best_weights = restore_best_weights
+        #         self.best_weights = None
+
+        #         if mode not in ['auto', 'min', 'max']:
+        #             logging.warning('EarlyStopping mode %s is unknown, '
+        #                             'fallback to auto mode.', mode)
+        #             mode = 'auto'
+
+        #         if mode == 'min':
+        #             print("sou np less")
+        #             self.monitor_op = np.less
+        #         elif mode == 'max':
+        #             print("sou np great")
+
+        #             self.monitor_op = np.greater
+        #         else:
+        #             print("co acc sou")
+        #             if 'acc' in self.monitor:
+        #                 print("np.greater")
+
+        #                 self.monitor_op = np.greater
+        #             else:
+        #                 print("sou np less")
+
+        #                 self.monitor_op = np.less
+
+        #         print("self.monitor_op é msmo, ", self.monitor_op)
+
+        #         if self.monitor_op == np.greater:
+        #             self.min_delta *= 1
+        #             print(" entrei no min delta*1")
+
+        #         else:
+        #             self.min_delta *= -1
+        #             print("yeah entrei aqui no mindelta*-1")
+
+        #         print("self.min_delta", self.min_delta)
+
+        #     def on_train_begin(self, logs=None):
+        #         # Allow instances to be re-used
+        #         self.wait = 0
+        #         self.stopped_epoch = 0
+        #         if self.baseline is not None:
+        #             self.best = self.baseline
+        #         else:
+        #             self.best = np.Inf if self.monitor_op == np.less else -np.Inf
+        #         print("this is self.best", self.best)
+
+        #     def on_epoch_end(self, epoch, logs=None):
+        #         current = self.get_monitor_value(logs)
+        #         if current is None:
+        #             return
+
+        #         print("\ncurrent", current)
+        #         print("self.min_delta", self.min_delta)
+        #         print("self.best",  self.best)
+        #         print("lets check having wait", self.wait)
+
+        #         if self.monitor_op(current - self.min_delta, self.best):
+        #             print("yeah entrou")
+
+        #             self.best = current
+        #             self.wait = 0
+        #             if self.restore_best_weights:
+        #                 self.best_weights = self.model.get_weights()
+        #         else:
+        #             print("saius")
+
+        #             self.wait += 1
+        #             print("increse wait", self.wait)
+        #             if self.wait >= self.patience:
+        #                 self.stopped_epoch = epoch
+        #                 self.model.stop_training = True
+        #                 if self.restore_best_weights:
+        #                     if self.verbose > 0:
+        #                         print(
+        #                             'Restoring model weights from the end of the best epoch.')
+        #                     self.model.set_weights(self.best_weights)
+
+        #     def on_train_end(self, logs=None):
+        #         if self.stopped_epoch > 0 and self.verbose > 0:
+        #             print('Epoch %05d: early stopping' %
+        #                   (self.stopped_epoch + 1))
+
+        #     def get_monitor_value(self, logs):
+        #         logs = logs or {}
+        #         monitor_value = logs.get(self.monitor)
+        #         if monitor_value is None:
+        #             logging.warning('Early stopping conditioned on metric `%s` '
+        #                             'which is not available. Available metrics are: %s',
+        #                             self.monitor, ','.join(list(logs.keys())))
+        #         return monitor_value
+
+        # early_stop = EarlyStopping(min_delta=0.5, patience=3, verbose=1)
+
         self.model.fit_generator(
             train_dataset,
             epochs=self.args.epochs,
@@ -110,7 +261,8 @@ class AbstractModel(ABC):
         )
 
     def get_path(self):
-        return self.MODEL_DIRECTORY + 'trained_models/' + str(self.args.__dict__)+'.h5'
+        # return self.MODEL_DIRECTORY + 'trained_models/' + str(self.args.__dict__)+'.h5'
+        return self.MODEL_DIRECTORY + 'trained_models/' + self.args.file_name+'.h5'
 
     def save(self):
         try:
@@ -132,7 +284,8 @@ class AbstractModel(ABC):
         scores = {key: str(values) for key, values in scores.items()}
 
         scores_path = self.MODEL_DIRECTORY + \
-            'evaluation_scores/' + str(self.args.__dict__)
+            'evaluation_scores/' + \
+            self.args.file_name  # str(self.args.__dict__)
         with open(scores_path+'.json', 'w+') as f:
             json.dump(scores, f, indent=2)
 
