@@ -1,12 +1,12 @@
 # from models.abstract_model import AbstractModel
 from models.abstract_model import AbstractModel
-
+from models.layers import _get_embedding_layer
 from tensorflow.keras.layers import Input, LSTM, Dense, Embedding, TimeDistributed
 from tensorflow.keras.models import Model
 import numpy as np
 import tensorflow as tf
 import time
-from preprocess_data.tokens import START_TOKEN, END_TOKEN
+from preprocess_data.tokens import START_TOKEN, END_TOKEN, PAD_TOKEN
 import logging
 # This attention model has the first state of decoder all zeros (and not receiving the encoder states as initial state)
 # Shape of the vector extracted from InceptionV3 is (64, 2048)
@@ -65,19 +65,21 @@ class BahdanauAttention(tf.keras.Model):
         return context_vector, attention_weights
 
 # if
-#encoder = Encoder( units)
-#decoder = Decoder(vocab_size, embedding_dim, units)
+# encoder = Encoder( units)
+# decoder = Decoder(vocab_size, embedding_dim, units)
 
 
 class Decoder(tf.keras.Model):
 
-    def __init__(self, vocab_size, embedding_size, units):  # the state
+    def __init__(self, embedding_type, vocab_size, embedding_size, token_to_id, units):  # the state
 
         super(Decoder, self).__init__()
 
         self.attention = BahdanauAttention(units)
-        self.embedding = tf.keras.layers.Embedding(
-            vocab_size, embedding_size, mask_zero=True)
+        #tf.keras.layers.Embedding(vocab_size, embedding_size, mask_zero=True)
+        self.embedding = _get_embedding_layer(
+            embedding_type, vocab_size, embedding_size, token_to_id)
+
         self.gru = tf.keras.layers.GRU(units,
                                        return_sequences=True,
                                        return_state=True,
@@ -86,9 +88,9 @@ class Decoder(tf.keras.Model):
             vocab_size, activation="softmax")
 
     def call(self, x, encoder_features, dec_hidden):
-        #print("np shape x", np.shape(x))
-        #print("np shape encoder_features", np.shape(encoder_features))
-        #print("np shape dec_hidden", np.shape(dec_hidden))
+        # print("np shape x", np.shape(x))
+        # print("np shape encoder_features", np.shape(encoder_features))
+        # print("np shape dec_hidden", np.shape(dec_hidden))
 
         # defining attention as a separate model
         context_vector, attention_weights = self.attention(
@@ -144,12 +146,28 @@ class AttentionModel(AbstractModel):
 
     def create(self):
         self.encoder = Encoder(self.embedding_size)
-        self.decoder = Decoder(
-            self.vocab_size, self.embedding_size, self.units)
+        self.decoder = Decoder(self.embedding_type,
+                               self.vocab_size, self.embedding_size, self.token_to_id, self.units)
 
     def build(self):
         self.crossentropy = tf.keras.losses.CategoricalCrossentropy()
         self.optimizer = tf.keras.optimizers.Adam()
+
+    def loss_function(self, real, pred):
+        # convert what is not padding [!=0] to True, and padding [==0] to false
+        mask = tf.math.logical_not(tf.math.equal(
+            np.argmax(real, axis=1), self.token_to_id[PAD_TOKEN]))  # 5,6,7
+        #mask = tf.math.logical_not(tf.math.equal(real, 0))
+
+        loss_ = self.crossentropy(real, pred)
+
+        # converst True and Falses to 0s and 1s
+        mask = tf.cast(mask, dtype=loss_.dtype)
+        # loss is multiplied by masks values (1s and 0s), thus filtering the padding (0)
+        loss_ *= mask
+
+        # mean/avarage by batch_size
+        return tf.reduce_mean(loss_)
 
     def summary(self):
         pass
@@ -162,7 +180,7 @@ class AttentionModel(AbstractModel):
         self.optimizer = tf.keras.optimizers.Adam()
 
         # self.build()
-        #self.model = tf.keras.models.load_model(self.get_path())
+        # self.model = tf.keras.models.load_model(self.get_path())
         ckpt = tf.train.Checkpoint(
             optimizer=self.optimizer, encoder=self.encoder, decoder=self.decoder)
         ckpt_manager = tf.train.CheckpointManager(
@@ -172,10 +190,11 @@ class AttentionModel(AbstractModel):
         if ckpt_manager.latest_checkpoint:
             logging.info("Restore model from checkpoint")
 
-    @tf.function
+    # @tf.function
     def train_step(self, img_tensor, input_caption_seq,  target_caption_seq):
 
         loss = 0
+
         dec_hidden = tf.zeros((self.args.batch_size, self.units))
 
         # max_len -1 since the input_seq has max_len -1 (without end token)
@@ -189,7 +208,8 @@ class AttentionModel(AbstractModel):
             for i in range(n_tokens):
                 predicted_output, dec_hidden, attention_weights = self.decoder(
                     input_caption_seq[:, i], encoder_features, dec_hidden)
-                loss += self.crossentropy(
+
+                loss += self.loss_function(
                     target_caption_seq[:, i], predicted_output)
 
         batch_loss = (loss / n_tokens)
@@ -208,6 +228,15 @@ class AttentionModel(AbstractModel):
             optimizer=self.optimizer, encoder=self.encoder, decoder=self.decoder)
         ckpt_manager = tf.train.CheckpointManager(
             ckpt, self.get_path(), max_to_keep=2)
+
+        early_stop = tf.keras.callbacks.EarlyStopping(
+            monitor='loss',
+            patience=3,
+            verbose=1,
+            restore_best_weights=True
+        )
+
+        early_stop.on_train_begin()
 
         start_epoch = 0
         ckpt.restore(ckpt_manager.latest_checkpoint)
@@ -244,12 +273,13 @@ class AttentionModel(AbstractModel):
                 i += 1
 
             ckpt_manager.save()
+            early_stop.on_epoch_end(epoch)
 
             epoch_loss = total_loss/train_steps
+            tf.print('\nTime taken for 1 epoch {} sec'.format(
+                time.time() - start))
             tf.print('Epoch {} Loss {:.4f}'.format(epoch,
                                                    epoch_loss))  # N_BATCH -> n_steps
-            tf.print('Time taken for 1 epoch {} sec\n'.format(
-                time.time() - start))
 
             # VALIDATION!
             total_loss = 0
@@ -272,14 +302,14 @@ class AttentionModel(AbstractModel):
 
                     predicted_output, dec_hidden, _ = self.decoder(
                         input_caption_seq[:, i], encoder_features, dec_hidden)
-                    loss += self.crossentropy(
+                    loss += self.loss_function(
                         target_caption_seq[:, i], predicted_output)
 
                 batch_loss = (loss / n_tokens)
                 total_loss += batch_loss
 
             epoch_loss = total_loss/val_steps
-            tf.print('Val Loss {:.4f}'.format(
+            tf.print('Val Loss {:.4f}\n'.format(
                 epoch_loss))  # N_BATCH -> n_steps
 
     def generate_text(self, input_image):
