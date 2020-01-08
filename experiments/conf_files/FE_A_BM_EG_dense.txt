@@ -7,3 +7,5 @@ BasicModel
 glove
 --image_model_type
 densenet
+--batch_size
+8
