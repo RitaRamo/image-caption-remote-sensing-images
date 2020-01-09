@@ -33,7 +33,7 @@ class BasicModel(AbstractModel):
 
     def _checkpoint(self):
         self.checkpoint_path = "./tf_ckpts"
-        return tf.train.Checkpoint(optimizer=self.model.optimizer, model=self.model)
+        return tf.train.Checkpoint(loss=tf.Variable(0.0), optimizer=self.model.optimizer, model=self.model)
 
     def create(self):
         # Encoder:

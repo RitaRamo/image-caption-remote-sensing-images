@@ -64,7 +64,10 @@ class AbstractModel(ABC):
             start_epoch = int(ckpt_manager.latest_checkpoint.split('-')[-1])
             logging.info(
                 "Restore model from checkpoint. Start epoch %s ", start_epoch)
-            logging.info("Last checkpoint loss %s", ckpt.loss)
+            logging.info("Last checkpoint loss %s\n", ckpt.loss)
+        else:
+            logging.info(
+                "No checkpoint. Will start model from beggining\n")
 
         return ckpt, ckpt_manager, start_epoch
 
@@ -120,12 +123,14 @@ class AbstractModel(ABC):
 
                     self.best = current
                     self.wait = 0
-                    ckpt.loss.assign(self.best)
+                    self.ckpt.loss.assign(self.best)
                     self.ckpt_manager.save()
 
                 else:
                     self.wait += 1
+                    logging.info("Val without improvement. Not Saving")
                     if self.wait >= self.patience:
+                        logging.info("Early stopping")
                         self.stopped_epoch = epoch
                         self.model.stop_training = True
 
@@ -133,8 +138,7 @@ class AbstractModel(ABC):
                                                  ckpt_manager,
                                                  baseline=ckpt.loss if start_epoch > 0 else None,
                                                  min_delta=0.0,
-                                                 patience=3,
-                                                 verbose=1
+                                                 patience=3
                                                  )
 
         self.model.fit_generator(
@@ -159,8 +163,8 @@ class AbstractModel(ABC):
         except Exception as e:
             logging.warning("saving model did not succeed %s", e)
         else:
-            if os.path.exists(self.checkpoint_path):  # "tf_ckpts"):
-                shutil.rmtree(self.checkpoint_path)  # "tf_ckpts")
+            if os.path.exists(self.checkpoint_path):
+                shutil.rmtree(self.checkpoint_path)
                 print("model saved, thus removing checkpoints")
             else:
                 print("unable to remove checkpoints, does not exist")
