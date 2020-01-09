@@ -26,7 +26,6 @@ from models.simple_model import SimpleModel
 from models.basic_model import BasicModel
 from models.attention_model import AttentionModel
 
-
 from models.simple_model_finetuning import SimpleFineTunedModel
 
 
@@ -135,7 +134,7 @@ if __name__ == "__main__":
 
     train_dataset = tf.data.Dataset.from_generator(
         lambda: train_generator,
-        ({'input_1': tf.float32, 'input_2': tf.float32}, tf.float32)
+        ({'input_1': tf.float32, 'input_2': tf.float32}, tf.float32),
     ).batch(args.batch_size)
 
     val_dataset = tf.data.Dataset.from_generator(
@@ -194,6 +193,7 @@ if __name__ == "__main__":
 
     model.save()
 
+# troco por 8!!!
 
 # Por a correr online (scp) [GOAL:hoje!!!]
 # Por a outra LSTM (até as 16:00)
