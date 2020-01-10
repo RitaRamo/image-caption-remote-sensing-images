@@ -118,9 +118,13 @@ class Decoder(tf.keras.Model):
         # output shape == (batch_size, vocab)
         output = self.dense(output)
 
-        return output, dec_hidden, attention_weights
+        # TODO: ADD LAYER DENSE with size of embeddings Dense(emebddize_size)
 
-# duvidas o gru nao posmos initial state? e se fosse lstm? ->qual o hidden q davamos? dado ter 2 states?
+        #emebding_output  = self.embedding(output)
+
+        return output, dec_hidden, attention_weights  # , emebding_output
+
+# duvidas o gru nao posmos initial state? e se fosse lstm? ->qual o hidden q davamos? dado ter 2 states? -> hidden!!!
 # tenta fazer tu com o model de acordo cm a explicação
 # qual e o initial state da gru?
 
@@ -173,7 +177,7 @@ class AttentionModel(AbstractModel):
     def loss_function(self, real, pred):
         # convert what is not padding [!=0] to True, and padding [==0] to false
         mask = tf.math.logical_not(tf.math.equal(
-            np.argmax(real, axis=1), self.token_to_id[PAD_TOKEN]))  # 5,6,7
+            np.argmax(real, axis=1), self.token_to_id[PAD_TOKEN]))
         # mask = tf.math.logical_not(tf.math.equal(real, 0))
 
         loss_ = self.crossentropy(real, pred)
@@ -224,6 +228,7 @@ class AttentionModel(AbstractModel):
 
         encoder_features = self.encoder(img_tensor)
         for i in range(n_tokens):
+
             predicted_output, dec_hidden, _ = self.decoder(
                 input_caption_seq[:, i], encoder_features, dec_hidden)
 
@@ -248,7 +253,7 @@ class AttentionModel(AbstractModel):
         for epoch in range(start_epoch, self.args.epochs):
             start = time.time()
 
-            def calculate_total_loss(train_or_val_dataset, n_steps, train_or_val_step, epoch=None):
+            def calculate_total_loss(train_or_val, train_or_val_dataset, n_steps, train_or_val_step, epoch):
                 total_loss = 0
                 batch_i = 0
                 for batch_samples in train_or_val_dataset.take(n_steps):
@@ -262,14 +267,14 @@ class AttentionModel(AbstractModel):
                     total_loss += batch_loss
 
                     if batch_i % 5 == 0:
-                        tf.print('Epoch {}; Batch {}/{}; Loss {:.4f}'.format(
-                            epoch, batch_i, n_steps, batch_loss))
+                        tf.print('{} -- Epoch {}/{}; Batch {}/{}; Loss {:.4f}'.format(
+                            train_or_val, epoch, self.args.epochs, batch_i, n_steps, batch_loss))
                     batch_i += 1
                 return total_loss
 
             # TRAIN
             total_loss = calculate_total_loss(
-                train_dataset, train_steps, self.train_step, epoch)
+                "TRAIN", train_dataset, train_steps, self.train_step, epoch)
 
             epoch_loss = total_loss/train_steps
 
@@ -280,7 +285,7 @@ class AttentionModel(AbstractModel):
 
             # VALIDATION
             total_val_loss = calculate_total_loss(
-                val_dataset, val_steps, self.validation_step)
+                "VAL", val_dataset, val_steps, self.validation_step, epoch)
 
             epoch_val_loss = total_val_loss/val_steps
 
@@ -302,7 +307,7 @@ class AttentionModel(AbstractModel):
 
         i = 1
 
-        dec_hidden = tf.zeros((self.args.batch_size, self.units))
+        dec_hidden = tf.zeros((1, self.units))
 
         while True:  # change to for!
             encoder_features = self.encoder(input_image)
