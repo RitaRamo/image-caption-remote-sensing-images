@@ -244,7 +244,7 @@ class AttentionModel(AbstractModel):
                                                  ckpt_manager,
                                                  baseline=ckpt.loss if start_epoch > 0 else None,
                                                  min_delta=0.0,
-                                                 patience=3
+                                                 patience=5
                                                  )
 
         train_steps, val_steps = self._get_steps(

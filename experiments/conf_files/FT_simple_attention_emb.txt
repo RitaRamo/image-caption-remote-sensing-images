@@ -1,0 +1,12 @@
+--file_name
+FT_simple_attention_emb.txt
+--model_class_str
+AttentionModel
+--batch_size
+8
+--epochs
+40
+--image_model_type
+inception
+--embedding_type
+glove
