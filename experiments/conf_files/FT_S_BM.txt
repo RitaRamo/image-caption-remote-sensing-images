@@ -3,3 +3,5 @@ FT_S_BM.txt
 --model_class_str
 BasicModel
 --fine_tuning
+--batch_size
+8
