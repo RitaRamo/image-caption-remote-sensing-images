@@ -5,10 +5,11 @@ from tensorflow.keras.models import Model
 import numpy as np
 
 from preprocess_data.tokens import START_TOKEN, END_TOKEN
+from preprocess_data.images import get_fine_tuning_model, flatten_images
 
 import spacy
 import tensorflow as tf
-#from models.layers import lstm
+# from models.layers import lstm
 
 
 class BasicModel(AbstractModel):
@@ -61,26 +62,39 @@ class BasicModel(AbstractModel):
 
         else:  # fine_tuning:
             # TODO: MUDA -> AQUI
-            base_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
-                                                           weights='imagenet')
-            new_input = base_model.input
-            hidden_layer = base_model.layers[-1].output
+            # print("entrei aqui com", np.shape(input1_images))
+            # base_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
+            #                                                weights='imagenet')
+            # new_input = base_model.input
+            # hidden_layer = base_model.layers[-1].output
 
-            for layer in base_model.layers[:249]:
-                layer.trainable = False
-            for layer in base_model.layers[249:]:
-                layer.trainable = True
+            # for layer in base_model.layers[:249]:
+            #     layer.trainable = False
+            # for layer in base_model.layers[249:]:
+            #     layer.trainable = True
 
-            finetuned_model = tf.keras.Model(new_input, hidden_layer)
+            # shape = input1_images.get_shape().as_list()
+            # dim = np.prod(shape[1:])
+            # input1_images = tf.reshape(input1_images, [-1, dim])
 
-            image = finetuned_model(input1_images)
+            # encoder_state = Dense(256, activation="relu")(input1_images)
+
+            # # TODO: ALL LAYERS ARE TRAINABLE -> TRUE!!
+
+            # finetuned_model = tf.keras.Model(new_input, encoder_state)
+
+            # return encoder_state
+
+            finetuned_model = get_fine_tuning_model(self.args.image_model_type)
+
+            images = finetuned_model(input1_images)
 
             # flatten ex inception: shape=(None, 299, 299, 3) -> shape=(None, 131072)
-            shape = image.get_shape().as_list()
+            shape = images.get_shape().as_list()
             dim = np.prod(shape[1:])
-            image = tf.reshape(image, [-1, dim])
+            images = tf.reshape(images, [-1, dim])
 
-            encoder_state = Dense(256, activation="relu")(image)
+            encoder_state = Dense(256, activation="relu")(images)
 
             return encoder_state
 
@@ -107,13 +121,13 @@ class BasicModel(AbstractModel):
         input_caption[:, 0] = self.token_to_id[START_TOKEN]
         i = 1
         while True:  # change to for!
-            #print("\ncurretn input", input_caption)
+            # print("\ncurretn input", input_caption)
 
             outputs_tokens = self.model.predict(
                 [input_image, input_caption])
             current_output_index = np.argmax(outputs_tokens[0, i-1])
             current_output_token = self.id_to_token[current_output_index]
-            #print("token", current_output_token)
+            # print("token", current_output_token)
 
             decoder_sentence += " " + current_output_token
 
@@ -172,13 +186,13 @@ class BasicModel(AbstractModel):
         input_caption[:, 0] = self.token_to_id[START_TOKEN]
         i = 1
         while True:  # change to for!
-            #print("\ncurretn input", input_caption)
+            # print("\ncurretn input", input_caption)
 
             outputs_tokens = self.model.predict(
                 [input_image, input_caption])
             current_output_index = np.argmax(outputs_tokens[0, i-1])
             current_output_token = self.id_to_token[current_output_index]
-            #print("token", current_output_token)
+            # print("token", current_output_token)
 
             decoder_sentence += " " + current_output_token
 

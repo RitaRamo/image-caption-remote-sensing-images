@@ -46,24 +46,90 @@ class ImageNetModelsPretrained(Enum):
     DENSENET = "densenet"
 
 
-def get_extractor_features_model(model_type):
+def _get_image_model(model_type):
     if model_type == ImageNetModelsPretrained.INCEPTION_V3.value:
-        logging.info("extract features with inception model")
+        logging.info("image model with inception model")
 
         image_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
                                                         weights='imagenet')
     else:
-        logging.info("extract features with densenet model")
+        logging.info("image model with densenet model")
 
         image_model = tf.keras.applications.densenet.DenseNet201(
             include_top=False, weights='imagenet')
 
-    new_input = image_model.input
-    hidden_layer = image_model.layers[-1].output
+    return image_model
 
-    extractor_features_model = tf.keras.Model(new_input, hidden_layer)
+
+def get_extractor_features_model(model_type):
+    image_model = _get_image_model(model_type)
+    extractor_features_model = tf.keras.Model(
+        image_model.input,  image_model.layers[-1].output)
 
     return extractor_features_model
+
+
+def get_fine_tuning_model(model_type):
+    image_model = _get_image_model(model_type)
+
+    for layer in image_model.layers:
+        layer.trainable = True
+
+    finetuned_model = tf.keras.Model(
+        image_model.input,  image_model.layers[-1].output)
+
+    return finetuned_model
+
+
+def flatten_images(images):
+    # flatten ex: inception - shape=(None, 64, 2048) -> shape=(None, 131072)
+    shape = images.get_shape().as_list()
+    dim = np.prod(shape[1:])
+    images = tf.reshape(images, [-1, dim])
+    return
+
+
+# def get_extractor_features_model(model_type):
+#     if model_type == ImageNetModelsPretrained.INCEPTION_V3.value:
+#         logging.info("extract features with inception model")
+
+#         image_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
+#                                                         weights='imagenet')
+#     else:
+#         logging.info("extract features with densenet model")
+
+#         image_model = tf.keras.applications.densenet.DenseNet201(
+#             include_top=False, weights='imagenet')
+
+#     new_input = image_model.input
+#     hidden_layer = image_model.layers[-1].output
+
+#     extractor_features_model = tf.keras.Model(new_input, hidden_layer)
+
+#     return extractor_features_model
+
+
+# def get_fine_tuning_model(model_type):
+#     if model_type == ImageNetModelsPretrained.INCEPTION_V3.value:
+#         logging.info("fine-tuning with inception model")
+
+#         image_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
+#                                                         weights='imagenet')
+#     else:
+#         logging.info("fine-tunin with densenet model")
+
+#         image_model = tf.keras.applications.densenet.DenseNet201(
+#             include_top=False, weights='imagenet')
+
+#     new_input = image_model.input
+#     hidden_layer = image_model.layers[-1].output
+
+    # for layer in image_model.layers:
+    #     layer.trainable = True
+
+    # finetuned_model = tf.keras.Model(new_input, hidden_layer)
+
+    # return finetuned_model
 
 
 class FlipsAndRotations(Enum):
