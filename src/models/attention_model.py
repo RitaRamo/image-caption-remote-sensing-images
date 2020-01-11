@@ -7,6 +7,7 @@ import numpy as np
 import tensorflow as tf
 import time
 from preprocess_data.tokens import START_TOKEN, END_TOKEN, PAD_TOKEN
+from preprocess_data.images import get_fine_tuning_model
 import logging
 from models.callbacks import EarlyStoppingWithCheckpoint
 # This attention model has the first state of decoder all zeros (and not receiving the encoder states as initial state)
@@ -15,17 +16,35 @@ from models.callbacks import EarlyStoppingWithCheckpoint
 
 class Encoder(tf.keras.Model):
 
-    def __init__(self, encoder_state_size):
+    def __init__(self, encoder_state_size, args):
         super(Encoder, self).__init__()
 
         self.dense = tf.keras.layers.Dense(
             encoder_state_size, activation="relu")
 
-    def call(self, images_features):
-        output = self.dense(images_features)
+        self.args = args
 
-        # if fine_tuning
-        # else
+    def call(self, input_images):
+
+        if not self.args.fine_tuning:
+            output = self.dense(input_images)
+
+        else:
+            finetuned_model = get_fine_tuning_model(self.args.image_model_type)
+
+            images = finetuned_model(input_images)
+
+            images = tf.reshape(
+                images,
+                (
+                    images.shape[0],
+                    -1,
+                    images.shape[3]
+                )
+            )
+
+            output = self.dense(images)
+
         return output
 
 
@@ -150,7 +169,7 @@ class AttentionModel(AbstractModel):
         self.model = None
 
     def create(self):
-        self.encoder = Encoder(self.embedding_size)
+        self.encoder = Encoder(self.embedding_size, self.args)
         self.decoder = Decoder(self.embedding_type,
                                self.vocab_size, self.embedding_size, self.token_to_id, self.units)
 
@@ -244,7 +263,7 @@ class AttentionModel(AbstractModel):
                                                  ckpt_manager,
                                                  baseline=ckpt.loss if start_epoch > 0 else None,
                                                  min_delta=0.0,
-                                                 patience=5
+                                                 patience=10
                                                  )
 
         train_steps, val_steps = self._get_steps(
