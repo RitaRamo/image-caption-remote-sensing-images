@@ -1,0 +1,9 @@
+--file_name
+FE_A_BM_dense.txt
+--model_class_str
+BasicModel
+--image_model_type
+densenet
+--batch_size
+8
+--augment_data
