@@ -80,6 +80,9 @@ class BahdanauAttention(tf.keras.Model):
 
         # context_vector shape after sum == (batch_size, features_shape1/enc_embedding)
         # it could be shape == (batch_size,  hidden_size) if enc_embedding == hidden_size/dec_unit)
+        # general idea: before you had softmax multiplied to each encoder_state/feature_shape0 (region of image),
+        # to have the final context vector, you want to add each of those, like a final embedding
+        # e1 [size 300] e2[size 300], ..., e64 [size 300] -> final_e[size 300]
         context_vector = tf.reduce_sum(context_vector, axis=1)
 
         return context_vector, attention_weights
@@ -331,13 +334,11 @@ class AttentionModel(AbstractModel):
         while True:  # change to for!
             encoder_features = self.encoder(input_image)
 
-            predicted_output, dec_hidden, attention_weights = self.decoder(
+            predicted_output, dec_hidden, _ = self.decoder(
                 input_caption, encoder_features, dec_hidden)
 
             current_output_index = np.argmax(predicted_output)
             current_output_token = self.id_to_token[current_output_index]
-
-            decoder_sentence += " " + current_output_token
 
             decoder_sentence += " " + current_output_token
 
