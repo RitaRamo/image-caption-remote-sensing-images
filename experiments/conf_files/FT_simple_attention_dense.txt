@@ -7,4 +7,4 @@ AttentionModel
 --epochs
 40
 --image_model_type
-dense
+densenet
