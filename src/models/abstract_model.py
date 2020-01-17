@@ -138,7 +138,7 @@ class AbstractModel(ABC):
                                                  ckpt_manager,
                                                  baseline=ckpt.loss if start_epoch > 0 else None,
                                                  min_delta=0.0,
-                                                 patience=15
+                                                 patience=3
                                                  )
 
         self.model.fit_generator(
