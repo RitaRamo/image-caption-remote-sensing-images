@@ -1,0 +1,11 @@
+--file_name
+FT_aug_attention_dense.txt
+--model_class_str
+AttentionModel
+--batch_size
+8
+--epochs
+40
+--image_model_type
+densenet
+--augment_data
