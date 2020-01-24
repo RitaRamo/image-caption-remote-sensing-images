@@ -1,5 +1,6 @@
 import argparse
 from preprocess_data.images import ImageNetModelsPretrained
+from models.embeddings import EmbeddingsType
 
 
 def get_args():
@@ -25,8 +26,29 @@ def get_args():
     parser.add_argument('--disable_metrics', action='store_true', default=False,
                         help='Conf just for testing: make the model does not run the metrics')
 
-    parser.add_argument(
-        '--embedding_type', help='embedding type (glove,spacy or None)', default=None)
+    # parser.add_argument(
+    #     '--embedding_type', help='embedding type (glove,spacy or None)', default=None)
+
+    parser.add_argument('--embedding_type', type=str, default=None,
+                        choices=[model.value for model in EmbeddingsType])
+
+    # parser.add_argument('--glove_emb_dim',
+    #                     choices=(50, 100, 200, 300), default=50, type=int)
+
+    #print("this is parser so far", parser.parse_known_args())
+    opts, _ = parser.parse_known_args()
+    if opts.embedding_type == EmbeddingsType.GLOVE.value:
+        parser.add_argument('--embedding_size',
+                            choices=(50, 100, 200, 300), default=50, type=int)
+    elif opts.embedding_type == EmbeddingsType.SPACY.value:
+        parser.add_argument('--embedding_size', type=int, default=None)
+    else:
+        parser.add_argument('--embedding_size', type=int, default=300)
+    # if opts.embedding_type == EmbeddingsType.GLOVE.value:
+    #     parser.add_argument('--glove_emb_dim',
+    #                         choices=(50, 100, 200, 300), default=50, type=int)
+    # else:
+    #     parser.add_argument('--embedding_size', type=int, default=300)
 
     parser.add_argument('--augment_data', action='store_true', default=False,
                         help='Set a switch to true')

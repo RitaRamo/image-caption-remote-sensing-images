@@ -13,7 +13,6 @@ from models.basic_model import BasicModel
 
 from models.simple_model_finetuning import SimpleFineTunedModel
 from models.attention_model import AttentionModel
-from models.attention_model_with_enc_initial_state import AttentionEncInitialStateModel
 from models.attention_model_with_continuos import AttentionContinuosModel
 
 
