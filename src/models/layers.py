@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.layers import Embedding
 import spacy
+from models.embeddings import get_glove_embeddings_matrix, get_spacy_embeddings_matrix_and_dim, EmbeddingsType
 
 
 def _get_embedding_layer(embedding_type, vocab_size, embedding_size, token_to_id):
@@ -9,47 +10,38 @@ def _get_embedding_layer(embedding_type, vocab_size, embedding_size, token_to_id
         return Embedding(vocab_size, embedding_size, mask_zero=True)
 
     embeddings_matrix = None
-    embedding_size = None
 
-    if embedding_type == "glove":
+    if embedding_type == EmbeddingsType.GLOVE.value:
 
-        glove_path = 'src/models/glove.6B/glove.6B.50d.txt'
-        embedding_size = 50
+        embeddings_matrix = get_glove_embeddings_matrix(
+            vocab_size, embedding_size, token_to_id)
 
-        def read_glove_vectors(path, lenght):
-            embeddings = {}
-            with open(path) as glove_f:
-                for line in glove_f:
-                    chunks = line.split()
-                    word = chunks[0]
-                    vector = np.array(chunks[1:])
-                    embeddings[word] = vector
+        # glove_path = 'src/models/glove.6B/glove.6B.300d.txt'
+        # embedding_size = 1000
 
-            return embeddings
+        # glove_embeddings = read_glove_vectors(
+        #     glove_path, embedding_size)
 
-        glove_embeddings = read_glove_vectors(
-            glove_path, embedding_size)
+        # # Init the embeddings layer with GloVe embeddings
+        # embeddings_matrix = np.zeros(
+        #     (vocab_size, embedding_size))
+        # for word, idx in token_to_id.items():
+        #     try:
+        #         embeddings_matrix[idx] = glove_embeddings[word]
+        #     except:
+        #         pass
 
-        # Init the embeddings layer with GloVe embeddings
-        embeddings_matrix = np.zeros(
-            (vocab_size, embedding_size))
-        for word, idx in token_to_id.items():
-            try:
-                embeddings_matrix[idx] = glove_embeddings[word]
-            except:
-                pass
+    elif embedding_type == EmbeddingsType.SPACY.value:
+        embeddings_matrix, embedding_size = get_spacy_embeddings_matrix_and_dim(
+            vocab_size, token_to_id)
 
-    elif embedding_type == "spacy":
-        nlp = spacy.load('en_core_web_md')
-        embedding_size = len(nlp.vocab['apple'].vector)
-
-        embeddings_matrix = np.zeros(
-            (vocab_size, embedding_size))
-        for word, i in token_to_id.items():
-            try:
-                embeddings_matrix[i] = nlp.vocab[word].vector
-            except:
-                pass
+        # embeddings_matrix = np.zeros(
+        #     (vocab_size, embedding_size))
+        # for word, i in token_to_id.items():
+        #     try:
+        #         embeddings_matrix[i] = nlp.vocab[word].vector
+        #     except:
+        #         pass
 
     return Embedding(vocab_size,
                      embedding_size,
