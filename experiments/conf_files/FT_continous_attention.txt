@@ -1,0 +1,10 @@
+--file_name
+FT_continous_attention.txt
+--model_class_str
+AttentionContinuosModel
+--batch_size
+8
+--epochs
+40
+--image_model_type
+inception
