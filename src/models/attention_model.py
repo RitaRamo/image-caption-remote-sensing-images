@@ -164,14 +164,14 @@ class AttentionModel(AbstractModel):
         id_to_token,
         encoder_input_size,
         embedding_type=None,
-        embedding_size=300,
         units=256
     ):
         super().__init__(args, vocab_size, max_len, token_to_id, id_to_token,
-                         encoder_input_size, embedding_type, embedding_size, units)
+                         encoder_input_size, embedding_type, units)
         self.model = None
 
     def create(self):
+
         self.encoder = Encoder(self.embedding_size, self.args)
         self.decoder = Decoder(self.embedding_type,
                                self.vocab_size, self.embedding_size, self.token_to_id, self.units)

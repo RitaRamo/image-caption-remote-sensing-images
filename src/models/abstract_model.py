@@ -5,6 +5,7 @@ import os
 import logging
 import shutil
 import numpy as np
+from models.embeddings import EmbeddingsType
 
 
 class AbstractModel(ABC):
@@ -20,7 +21,6 @@ class AbstractModel(ABC):
         id_to_token,
         encoder_input_size,
         embedding_type=None,
-        embedding_size=300,
         units=256
     ):
         self.args = args
@@ -30,7 +30,9 @@ class AbstractModel(ABC):
         self.id_to_token = id_to_token
         self.encoder_input_size = encoder_input_size
         self.embedding_type = embedding_type
-        self.embedding_size = embedding_size
+
+        self.embedding_size = args.embedding_size
+
         self.units = units
         self.model = None
         self.checkpoint_path = None

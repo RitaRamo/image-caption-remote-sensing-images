@@ -25,11 +25,11 @@ class BasicModel(AbstractModel):
         id_to_token,
         encoder_input_size,
         embedding_type=None,
-        embedding_size=300,
         units=256
     ):
         super().__init__(args, vocab_size, max_len, token_to_id, id_to_token,
-                         encoder_input_size, embedding_type, embedding_size, units)
+                         encoder_input_size, embedding_type, units)
+
         self.model = None
 
     def _checkpoint(self):
@@ -61,29 +61,6 @@ class BasicModel(AbstractModel):
                 self.units, activation="relu")(input1_images)
 
         else:  # fine_tuning:
-            # TODO: MUDA -> AQUI
-            # print("entrei aqui com", np.shape(input1_images))
-            # base_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
-            #                                                weights='imagenet')
-            # new_input = base_model.input
-            # hidden_layer = base_model.layers[-1].output
-
-            # for layer in base_model.layers[:249]:
-            #     layer.trainable = False
-            # for layer in base_model.layers[249:]:
-            #     layer.trainable = True
-
-            # shape = input1_images.get_shape().as_list()
-            # dim = np.prod(shape[1:])
-            # input1_images = tf.reshape(input1_images, [-1, dim])
-
-            # encoder_state = Dense(256, activation="relu")(input1_images)
-
-            # # TODO: ALL LAYERS ARE TRAINABLE -> TRUE!!
-
-            # finetuned_model = tf.keras.Model(new_input, encoder_state)
-
-            # return encoder_state
 
             finetuned_model = get_fine_tuning_model(self.args.image_model_type)
 
