@@ -192,9 +192,6 @@ class AttentionContinuosModel(AttentionModel):
         # real: y_true - one hot encoding shape [1, vocab size] -> get np.argmax before embbedging
         # pred: y_^ - probs of sotfmax [1, vocab size] -> get np.argmax before embbedging
 
-        print("this is the real", real)
-        print("this is the pred", np.shape(embedding_predicted))
-
         embedding_real = embedding_layer(
             np.argmax(real, axis=1))  # errado q deve ser o valor
 
@@ -208,15 +205,12 @@ class AttentionContinuosModel(AttentionModel):
             embedding_predicted
         )
 
-        print("this is loss_", loss_)
-
         # converst True and Falses to 0s and 1s
         mask = tf.cast(mask, dtype=loss_.dtype)
         # loss is multiplied by masks values (1s and 0s), thus filtering the padding (0)
         loss_ *= mask
 
         # mean/avarage by batch_size
-        print("this is the reuce mean",  tf.reduce_mean(loss_))
 
         return tf.reduce_mean(loss_)
 
