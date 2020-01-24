@@ -220,9 +220,6 @@ class AttentionContinuosModel(AttentionModel):
         encoder_features = self.encoder(img_tensor)
         for i in range(n_tokens):
 
-            print("\neste é o valor q entra no embedding",
-                  input_caption_seq[:, i])
-
             predicted_output, dec_hidden, _, embedding_layer = self.decoder(
                 input_caption_seq[:, i], encoder_features, dec_hidden)
 
@@ -241,7 +238,6 @@ class AttentionContinuosModel(AttentionModel):
                 n_tokens, dec_hidden, img_tensor, input_caption_seq,  target_caption_seq)
 
         batch_loss = (loss / n_tokens)
-        print("this is batch loss", batch_loss)
 
         trainable_variables = self.encoder.trainable_variables + \
             self.decoder.trainable_variables
