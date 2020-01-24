@@ -27,7 +27,7 @@ from models.basic_model import BasicModel
 from models.attention_model import AttentionModel
 
 from models.simple_model_finetuning import SimpleFineTunedModel
-
+from models.attention_model_with_continuos import AttentionContinuosModel
 
 from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
                                     convert_captions_to_Y, preprocess_tokens)

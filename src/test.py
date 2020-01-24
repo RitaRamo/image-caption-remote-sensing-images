@@ -13,6 +13,8 @@ from models.basic_model import BasicModel
 
 from models.simple_model_finetuning import SimpleFineTunedModel
 from models.attention_model import AttentionModel
+from models.attention_model_with_enc_initial_state import AttentionEncInitialStateModel
+from models.attention_model_with_continuos import AttentionContinuosModel
 
 
 import os
@@ -57,6 +59,8 @@ if __name__ == "__main__":
         id_to_token,
         generator.get_shape_of_input_image(),
     )
+
+    logging.info("loading the model")
 
     model.load()
 
