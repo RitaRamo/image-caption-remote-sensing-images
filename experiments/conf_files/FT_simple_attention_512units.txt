@@ -1,0 +1,10 @@
+--file_name
+FT_simple_attention_512units.txt
+--model_class_str
+AttentionModel
+--batch_size
+8
+--epochs
+40
+--units
+512
