@@ -1,6 +1,7 @@
 import argparse
 from preprocess_data.images import ImageNetModelsPretrained
 from models.embeddings import EmbeddingsType
+from optimizers.optimizers import OptimizerType
 
 
 def get_args():
@@ -28,6 +29,12 @@ def get_args():
 
     # parser.add_argument(
     #     '--embedding_type', help='embedding type (glove,spacy or None)', default=None)
+
+    parser.add_argument('--units', type=int, default=256,
+                        help='define units to train the model')
+
+    parser.add_argument('--optimizer_type', type=str, default=OptimizerType.ADAM.value,
+                        choices=[optimizer.value for optimizer in OptimizerType])
 
     parser.add_argument('--embedding_type', type=str, default=None,
                         choices=[model.value for model in EmbeddingsType])
