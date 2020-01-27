@@ -1,0 +1,13 @@
+--file_name
+FE_A_BM_EG_200emb.txt
+--model_class_str
+BasicModel
+--augment_data
+--embedding_type
+glove
+--batch_size
+8
+----epochs
+40
+--embedding_size
+200
