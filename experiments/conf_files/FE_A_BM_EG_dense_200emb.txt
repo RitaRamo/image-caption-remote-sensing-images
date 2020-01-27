@@ -7,7 +7,7 @@ BasicModel
 glove
 --batch_size
 8
-----epochs
+--epochs
 40
 --embedding_size
 200
