@@ -29,6 +29,9 @@ from models.attention_model import AttentionModel
 from models.simple_model_finetuning import SimpleFineTunedModel
 from models.attention_model_with_continuos import AttentionContinuosModel
 from models.attention_model_with_enc_initial_state import AttentionEncInitialStateModel
+# from models.attention_model_with_all_context import AttentionAllContextModel
+# from models.attention_model_with_all_context2 import AttentionAllContextModel2
+
 from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
                                     convert_captions_to_Y, preprocess_tokens)
 
@@ -182,7 +185,8 @@ if __name__ == "__main__":
         token_to_id,
         id_to_token,
         generator.get_shape_of_input_image(),
-        args.embedding_type
+        args.embedding_type,
+        args.units
     )
 
     model.create()

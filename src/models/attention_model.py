@@ -10,6 +10,7 @@ from preprocess_data.tokens import START_TOKEN, END_TOKEN, PAD_TOKEN
 from preprocess_data.images import get_fine_tuning_model
 import logging
 from models.callbacks import EarlyStoppingWithCheckpoint
+from optimizers.optimizers import get_optimizer
 # This attention model has the first state of decoder all zeros (and not receiving the encoder states as initial state)
 # Shape of the vector extracted from InceptionV3 is (64, 2048)
 
@@ -178,7 +179,9 @@ class AttentionModel(AbstractModel):
 
     def build(self):
         self.crossentropy = tf.keras.losses.CategoricalCrossentropy()
-        self.optimizer = tf.keras.optimizers.Adam()
+        self.optimizer = get_optimizer(self.args.optimizer_type)
+
+        # tf.keras.optimizers.Adam() get_optimizer
 
     def summary(self):
         pass
@@ -188,7 +191,9 @@ class AttentionModel(AbstractModel):
 
     def load(self):
         self.create()
-        self.optimizer = tf.keras.optimizers.Adam()
+        self.optimizer = get_optimizer(self.args.optimizer_type)
+        #self.optimizer = tf.keras.optimizers.Adam()
+        #self.optimizer = AdaMod()
         self._load_latest_checkpoint()
 
     def _checkpoint(self):
@@ -266,7 +271,7 @@ class AttentionModel(AbstractModel):
                                                  ckpt_manager,
                                                  baseline=ckpt.loss if start_epoch > 0 else None,
                                                  min_delta=0.0,
-                                                 patience=5
+                                                 patience=3
                                                  )
 
         train_steps, val_steps = self._get_steps(
