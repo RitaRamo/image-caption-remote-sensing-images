@@ -15,6 +15,8 @@ from models.simple_model_finetuning import SimpleFineTunedModel
 from models.attention_model import AttentionModel
 from models.attention_model_with_continuos import AttentionContinuosModel
 from models.attention_model_with_enc_initial_state import AttentionEncInitialStateModel
+from models.attention_model_lstm import AttentionLSTMModel
+
 # from models.attention_model_with_all_context import AttentionAllContextModel
 # from models.attention_model_with_all_context2 import AttentionAllContextModel2
 
