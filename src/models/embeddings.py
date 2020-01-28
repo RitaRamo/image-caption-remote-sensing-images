@@ -1,6 +1,7 @@
 import numpy as np
 from enum import Enum
 import spacy
+from preprocess_data.tokens import END_TOKEN
 
 
 class EmbeddingsType(Enum):
@@ -28,7 +29,7 @@ def get_glove_embeddings_matrix(vocab_size, embedding_size, token_to_id):
     glove_embeddings = read_glove_vectors(
         glove_path, embedding_size)
 
-    # Init the embeddings layer with GloVe embeddings
+    # Init the embeddings layer
     embeddings_matrix = np.zeros(
         (vocab_size, embedding_size))
     for word, id in token_to_id.items():
@@ -38,6 +39,31 @@ def get_glove_embeddings_matrix(vocab_size, embedding_size, token_to_id):
             pass
 
     return embeddings_matrix
+
+
+def get_glove_embeddings_matrix_for_continuous(vocab_size, embedding_size, token_to_id):
+    # ter caderno, fazer a logica, ver outros problemas...
+
+    glove_path = 'src/models/glove.6B/glove.6B.'+str(embedding_size) + 'd.txt'
+
+    glove_embeddings = read_glove_vectors(
+        glove_path, embedding_size)
+
+    embedding_size = embedding_size+1  # add one dim for the END_TOKEN
+
+    # Init the embeddings layer
+    embeddings_matrix = np.zeros(
+        (vocab_size, embedding_size))
+
+    embeddings_matrix[token_to_id[END_TOKEN], -1] = 1
+
+    for word, id in token_to_id.items():
+        try:
+            embeddings_matrix[id, :-1] = glove_embeddings[word]
+        except:
+            pass
+
+    return embeddings_matrix, embedding_size
 
 
 def read_spacy_embeddings_and_dim(path, lenght):

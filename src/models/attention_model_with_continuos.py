@@ -10,7 +10,7 @@ from preprocess_data.images import get_fine_tuning_model
 import logging
 from models.callbacks import EarlyStoppingWithCheckpoint
 from models.attention_model import AttentionModel
-from models.embeddings import get_glove_embeddings_matrix
+from models.embeddings import get_glove_embeddings_matrix_for_continuous
 from sklearn.metrics.pairwise import cosine_similarity
 # This attention model has the first state of decoder all zeros (and not receiving the encoder states as initial state)
 # Shape of the vector extracted from InceptionV3 is (64, 2048)
@@ -94,9 +94,6 @@ class Decoder(tf.keras.Model):
         super(Decoder, self).__init__()
 
         self.attention = BahdanauAttention(units)
-        # tf.keras.layers.Embedding(vocab_size, embedding_size, mask_zero=True)
-        # TODO: keeping this embedding layer fixed and tied with pre-trained target output embeddings (Press
-        # TENS Q POR AQUI Q É A DO GLOVE
 
         self.embedding = Embedding(vocab_size,
                                    embedding_size,
@@ -136,7 +133,7 @@ class Decoder(tf.keras.Model):
         # tf.expand_dims(context_vector, 1) shape == (batch_size, 1,enc_embedding_dim) or hidden_size if enc_embedding == dec_unit
         # tf.expand_dims(x, 1) shape == (batch_size, 1, embedding_dim)
         # x shape after concatenation == (batch_size, 1,  enc_embedding_dim + embedding_dim) or hidden_size + embedding_dim if enc_embedding == dec_unit
-        # ex: (batch_size, 1, 600) if hidden_size=300 and embding_dim is 300)
+        # ex: (batch_size, 1, 600) if enc_embedding_dim=300 and embding_dim is 300)
         x = tf.concat([tf.expand_dims(context_vector, 1),
                        tf.expand_dims(x, 1)], axis=-1)
 
@@ -179,10 +176,11 @@ class AttentionContinuosModel(AttentionModel):
 
     def create(self):
         self.encoder = Encoder(self.embedding_size, self.args)
-        self.embeddings_matrix = get_glove_embeddings_matrix(
+
+        self.embeddings_matrix, embedding_size = get_glove_embeddings_matrix_for_continuous(
             self.vocab_size, self.embedding_size, self.token_to_id)
         self.decoder = Decoder(self.embeddings_matrix,
-                               self.vocab_size, self.embedding_size, self.units)
+                               self.vocab_size, embedding_size, self.units)
 
     def build(self):
         self.log_cosh = tf.keras.losses.LogCosh()
@@ -340,7 +338,7 @@ class AttentionContinuosModel(AttentionModel):
                 input_caption, encoder_features, dec_hidden)
 
             output_similarity_to_embeddings = cosine_similarity(
-                predicted_embedding_output, self.embeddings_matrix)
+                self.embeddings_matrix, predicted_embedding_output)
 
             current_output_index = np.argmax(output_similarity_to_embeddings)
 

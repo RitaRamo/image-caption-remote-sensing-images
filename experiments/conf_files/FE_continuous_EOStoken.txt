@@ -1,0 +1,10 @@
+--file_name
+FE_continuous_EOStoken.txt
+--model_class_str
+AttentionContinuosModel
+--batch_size
+8
+--epochs
+40
+--image_model_type
+inception
