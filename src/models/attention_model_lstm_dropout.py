@@ -14,7 +14,7 @@ from optimizers.optimizers import get_optimizer
 # This attention model has the first state of decoder all zeros (and not receiving the encoder states as initial state)
 # Shape of the vector extracted from InceptionV3 is (64, 2048)
 
-from models.attention_model import Encoder, BahdanauAttention, AttentionModel
+from models.attention_model import AttentionModel, Encoder, BahdanauAttention
 
 
 class Decoder(tf.keras.Model):
@@ -25,20 +25,22 @@ class Decoder(tf.keras.Model):
 
         self.attention = BahdanauAttention(units)
         # tf.keras.layers.Embedding(vocab_size, embedding_size, mask_zero=True)
-        self.embedding = _get_embedding_layer(
-            embedding_type, vocab_size, embedding_size, token_to_id)
+        self.embedding = Embedding(
+            vocab_size, embedding_size, mask_zero=True)
 
         self.lstm = tf.keras.layers.LSTM(units,
                                          return_sequences=True,
                                          return_state=True
                                          )
 
-        self.dropout = tf.keras.layers.Dropout(rate=0.5)
+        self.dropout = tf.keras.layers.Dropout(
+            rate=0.5)
 
         self.dense = tf.keras.layers.Dense(
             vocab_size, activation="softmax")
 
     def call(self, x, encoder_features, dec_hidden):
+
         # print("np shape x", np.shape(x))
         # print("np shape encoder_features", np.shape(encoder_features))
         # print("np shape dec_hidden", np.shape(dec_hidden))
@@ -58,11 +60,11 @@ class Decoder(tf.keras.Model):
         x = tf.concat([tf.expand_dims(context_vector, 1),
                        tf.expand_dims(x, 1)], axis=-1)
 
-        x = self.dropout(x)
-
         # passing the concatenated vector to the GRU
         # apply GRU output shape == (batch_size, 1, dec_units); dec_hidden shape == (batch_size, dec_units)
         output, dec_hidden, cell_state = self.lstm(x)
+
+        output = self.dropout(output, training=True)
 
         # output shape == (batch_size, dec_units)
         output = tf.reshape(output, (-1, output.shape[2]))
@@ -101,6 +103,7 @@ class AttentionLSTMDroupoutModel(AttentionModel):
         self.model = None
 
     def create(self):
-        self.encoder = Encoder(self.embedding_size, self.args)
+        self.encoder = Encoder(
+            self.embedding_size, self.args)
         self.decoder = Decoder(self.embedding_type,
                                self.vocab_size, self.embedding_size, self.token_to_id, self.units)
