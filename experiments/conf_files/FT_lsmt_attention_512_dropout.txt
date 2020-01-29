@@ -1,0 +1,10 @@
+--file_name
+FT_lsmt_attention_512_dropout.txt
+--model_class_str
+AttentionLSTMDroupoutModel
+--batch_size
+8
+--epochs
+40
+--units
+512

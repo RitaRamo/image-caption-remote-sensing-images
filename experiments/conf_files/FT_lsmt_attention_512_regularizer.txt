@@ -1,0 +1,10 @@
+--file_name
+FT_lsmt_attention_512_regularizer.txt
+--model_class_str
+AttentionLSTMRegularizerModel
+--batch_size
+8
+--epochs
+40
+--units
+512
