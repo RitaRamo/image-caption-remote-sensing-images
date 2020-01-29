@@ -117,11 +117,4 @@ class AttentionLSTMRegularizerModel(AttentionModel):
         loss_ *= mask
 
         # mean/avarage by batch_size
-        print("decoder loss", self.decoder.losses)
-        print("tf reduced mean before", tf.reduce_mean(loss_))
-        print("tf reduced mean after", tf.reduce_mean(
-            loss_ + self.decoder.losses))
-        print("idea ", tf.reduce_mean(
-            loss_) + self.decoder.losses)
-
         return tf.reduce_mean(loss_ + self.decoder.losses)

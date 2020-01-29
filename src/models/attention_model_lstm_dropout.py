@@ -58,10 +58,7 @@ class Decoder(tf.keras.Model):
         x = tf.concat([tf.expand_dims(context_vector, 1),
                        tf.expand_dims(x, 1)], axis=-1)
 
-        print("np shape x before", np.shape(x))
         x = self.dropout(x)
-
-        print("np shape x after dropout", np.shape(x))
 
         # passing the concatenated vector to the GRU
         # apply GRU output shape == (batch_size, 1, dec_units); dec_hidden shape == (batch_size, dec_units)
