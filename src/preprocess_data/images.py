@@ -22,9 +22,12 @@ def preprocess_image(img, model_type):
     if model_type == ImageNetModelsPretrained.INCEPTION_V3.value:
         img = tf.image.resize(img, (299, 299))
         img = tf.keras.applications.inception_v3.preprocess_input(img)
-    else:
+    elif model_type == ImageNetModelsPretrained.DENSENET.value:
         img = tf.image.resize(img, (224, 224))
         img = tf.keras.applications.densenet.preprocess_input(img)
+    else:  # vgg16
+        img = tf.image.resize(img, (224, 224))
+        img = tf.keras.applications.vgg16.preprocess_input(img)
 
     img = tf.expand_dims(img, 0)
     return img
@@ -44,6 +47,7 @@ def get_inception_pretrained():
 class ImageNetModelsPretrained(Enum):
     INCEPTION_V3 = "inception"
     DENSENET = "densenet"
+    VGG16 = "vgg16"
 
 
 def _get_image_model(model_type):
@@ -52,10 +56,16 @@ def _get_image_model(model_type):
 
         image_model = tf.keras.applications.InceptionV3(include_top=False,  # because it is false, its doesnot have the last layer
                                                         weights='imagenet')
-    else:
+    elif model_type == ImageNetModelsPretrained.DENSENET:
         logging.info("image model with densenet model")
 
         image_model = tf.keras.applications.densenet.DenseNet201(
+            include_top=False, weights='imagenet')
+
+    else:
+        logging.info("image model with vgg16 model")
+
+        image_model = tf.keras.applications.vgg16.VGG16(
             include_top=False, weights='imagenet')
 
     return image_model
