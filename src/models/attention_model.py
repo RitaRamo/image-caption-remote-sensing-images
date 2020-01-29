@@ -201,6 +201,7 @@ class AttentionModel(AbstractModel):
         return tf.train.Checkpoint(loss=tf.Variable(0.0), attempted_epoch=tf.Variable(0),
                                    optimizer=self.optimizer, encoder=self.encoder, decoder=self.decoder)
 
+    # needed since we are giving batches some with padding others without
     def loss_function(self, real, pred):
         # convert what is not padding [!=0] to True, and padding [==0] to false
         mask = tf.math.logical_not(tf.math.equal(
