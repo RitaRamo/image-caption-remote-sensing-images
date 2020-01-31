@@ -1,0 +1,10 @@
+--file_name
+FT_lstm_attention_256_dataset2.txt
+--model_class_str
+AttentionLSTMModel
+--batch_size
+8
+--epochs
+40
+--units
+256
