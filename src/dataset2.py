@@ -9,6 +9,7 @@ from collections import defaultdict
 from generators.abstract_generator import PATH
 from preprocess_data.tokens import (END_TOKEN, START_TOKEN,
                                     convert_captions_to_Y, preprocess_tokens)
+import re
 
 
 def _get_images_and_captions(dataset):
@@ -17,8 +18,10 @@ def _get_images_and_captions(dataset):
     for row in dataset["images"]:
         image_name = row["filename"]
         for caption in row["sentences"]:
+            caption = re.sub(r'\.', r'', caption["raw"])
+
             tokens = [START_TOKEN] + \
-                tokenizer.tokenize(caption["raw"]) + [END_TOKEN]
+                tokenizer.tokenize(caption) + [END_TOKEN]
 
             captions_of_tokens.append(tokens)
             images_names.append(image_name)
@@ -33,8 +36,8 @@ def _get_dict_image_and_its_captions(dataset):
     for row in dataset["images"]:
         image_name = row["filename"]
         for caption in row["sentences"]:
-            caption_of_tokens = " ".join(
-                [START_TOKEN] + tokenizer.tokenize(caption["raw"]) + [END_TOKEN])
+            caption = re.sub(r'\.', r'', caption["raw"])
+            caption_of_tokens = START_TOKEN + " " + caption + END_TOKEN
 
             images_captions[image_name].append(caption_of_tokens)
 
