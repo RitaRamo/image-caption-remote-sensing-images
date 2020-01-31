@@ -36,12 +36,12 @@ if __name__ == "__main__":
 
     raw_dataset = pd.read_json(PATH + "dataset_rsicd.json")
 
-    vocab_info = get_vocab_info("src/datasets/RSICD/dataset/")
+    vocab_info = get_vocab_info("src/datasets/RSICD/dataset2/")
     vocab_size, token_to_id, id_to_token, max_len = vocab_info[
         "vocab_size"], vocab_info["token_to_id"], vocab_info["id_to_token"], vocab_info["max_len"]
 
     test_dataset = get_dataset(
-        "src/datasets/RSICD/dataset/test.json")
+        "src/datasets/RSICD/dataset2/test.json")
 
     generator_args = (raw_dataset, args.image_model_type)
 
