@@ -8,9 +8,9 @@ class OptimizerType(Enum):
     ADAMOD = "adamod"
 
 
-def get_optimizer(optimizer_type):
+def get_optimizer(optimizer_type, learning_rate=0.001):
 
     if optimizer_type == OptimizerType.ADAMOD.value:
         return AdaMod()
     else:
-        return tf.keras.optimizers.Adam()
+        return tf.keras.optimizers.Adam(learning_rate)
