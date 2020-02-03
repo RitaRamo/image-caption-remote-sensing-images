@@ -65,6 +65,9 @@ def get_args():
     parser.add_argument('--fine_tuning', action='store_true', default=False,
                         help='Set a switch to true')
 
+    parser.add_argument('--beam_search', action='store_true', default=False,
+                        help='Set beam search or use default greedy')
+
     args = parser.parse_args()
 
     return args

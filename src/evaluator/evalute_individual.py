@@ -14,13 +14,13 @@ class EvaluatorIndividualMetrics():
         self.generator = generator
         self.model = model
 
-    def evaluate(self, test_dataset, disable_metrics):
+    def evaluate(self, test_dataset, args):
         logging.info("start evaluating")
 
         predicted = {}
 
         metrics = {}
-        if disable_metrics:
+        if args.disable_metrics:
             logging.info(
                 "disable_metrics = True, thus will not compute metrics")
 
@@ -35,10 +35,13 @@ class EvaluatorIndividualMetrics():
             img_tensor = self.generator.get_image(img_name)
             #img_tensor = tf.expand_dims(img_tensor, axis=0)
 
-            text_generated = self.model.generate_text(
-                img_tensor)
+            if args.beam_search:
+                text_generated = self.model.beam_search(img_tensor)
+            else:
+                text_generated = self.model.generate_text(
+                    img_tensor)
 
-            if disable_metrics:
+            if args.disable_metrics:
                 break
 
             #logging.info("how this is the caption", text_generated)
@@ -72,8 +75,8 @@ class EvaluatorIndividualMetrics():
         return predicted
 
     def compare_results(self, nlgeval, references_captions, predicted_captions):
-        logging.info("\nref %s", references_captions)
-        logging.info("caption %s", predicted_captions)
+        #logging.info("ref %s", references_captions)
+        #logging.info("caption %s", predicted_captions)
 
         metrics_dict = nlgeval.compute_individual_metrics(
             references_captions, predicted_captions)
