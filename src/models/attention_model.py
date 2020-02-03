@@ -11,6 +11,7 @@ from preprocess_data.images import get_fine_tuning_model
 import logging
 from models.callbacks import EarlyStoppingWithCheckpoint
 from optimizers.optimizers import get_optimizer
+import operator
 # This attention model has the first state of decoder all zeros (and not receiving the encoder states as initial state)
 # Shape of the vector extracted from InceptionV3 is (64, 2048)
 
@@ -143,7 +144,7 @@ class Decoder(tf.keras.Model):
 
         # TODO: ADD LAYER DENSE with size of embeddings Dense(emebddize_size)
 
-        #emebding_output  = self.embedding(output)
+        # emebding_output  = self.embedding(output)
 
         return output, dec_hidden, attention_weights  # , emebding_output
 
@@ -194,8 +195,8 @@ class AttentionModel(AbstractModel):
         self.create()
         self.optimizer = get_optimizer(
             self.args.optimizer_type, self.args.optimizer_lr)
-        #self.optimizer = tf.keras.optimizers.Adam()
-        #self.optimizer = AdaMod()
+        # self.optimizer = tf.keras.optimizers.Adam()
+        # self.optimizer = AdaMod()
         self._load_latest_checkpoint()
 
     def _checkpoint(self):
@@ -338,10 +339,9 @@ class AttentionModel(AbstractModel):
         i = 1
 
         dec_hidden = tf.zeros((1, self.units))
+        encoder_features = self.encoder(input_image)
 
         while True:  # change to for!
-            encoder_features = self.encoder(input_image)
-
             predicted_output, dec_hidden, _ = self.decoder(
                 input_caption, encoder_features, dec_hidden)
 
@@ -361,3 +361,64 @@ class AttentionModel(AbstractModel):
         print("\ndecoded sentence", decoder_sentence)
 
         return decoder_sentence  # input_caption
+
+    def model_predict(self, last_token, encoder_features, dec_hidden):
+        input_caption = np.array([self.token_to_id[last_token]])
+
+        predicted_output, dec_hidden, _ = self.decoder(
+            input_caption, encoder_features, dec_hidden)
+
+        return predicted_output[0], dec_hidden
+
+    def beam_search(self, input_image):
+
+        def generate_n_solutions(seed_text, seed_prob, encoder_features,  dec_hidden,  n_solutions):
+            last_token = seed_text[-1]
+
+            if last_token == END_TOKEN:
+                return [(seed_text, seed_prob, dec_hidden)]
+
+            top_solutions = []
+            probs, dec_hidden = self.model_predict(
+                last_token, encoder_features, dec_hidden)
+
+            best_index_words = np.argsort(probs)[-n_solutions:][::-1]
+
+            for index in best_index_words:
+                text = seed_text + [self.id_to_token[index]]
+                prob = seed_prob + np.log(probs[index])
+                top_solutions.append((text, prob, dec_hidden))
+
+            return top_solutions
+
+        def get_most_probable(candidates, n_solutions):
+            return sorted(candidates, key=operator.itemgetter(1), reverse=True)[:n_solutions]
+
+        def generate_beam_search(n_solutions=3):
+            dec_hidden = tf.zeros((1, self.units))
+            encoder_features = self.encoder(input_image)
+
+            top_solutions = [([START_TOKEN], 0.0, dec_hidden)]
+
+            # top_solutions=generate_n_solutions(seed_text, 1.0, n_solutions)
+            for _ in range(self.max_len):
+                candidates = []
+                for sentence, prob, dec_hidden in top_solutions:
+                    candidates.extend(generate_n_solutions(
+                        sentence, prob, encoder_features, dec_hidden,  n_solutions))
+
+                top_solutions = get_most_probable(candidates, n_solutions)
+                #a, b, c = zip(*top_solutions)
+                #print("\n", a)
+
+            best_tokens, prob, dec_hidden = top_solutions[0]
+
+            # best_tokens=best_tokens[1:] #remove start token
+            # best_tokens=best_tokens[:-1] if best_tokens[-1]==END_TOKEN else best_tokens #remove end token
+
+            best_sentence = " ".join(best_tokens)
+
+            print("\nbeam decoded sentence:", best_sentence)
+            return best_sentence
+
+        return generate_beam_search()
