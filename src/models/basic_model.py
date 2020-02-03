@@ -71,7 +71,7 @@ class BasicModel(AbstractModel):
             dim = np.prod(shape[1:])
             images = tf.reshape(images, [-1, dim])
 
-            encoder_state = Dense(256, activation="relu")(images)
+            encoder_state = Dense(self.units, activation="relu")(images)
 
             return encoder_state
 
@@ -181,6 +181,6 @@ class BasicModel(AbstractModel):
 
             i += 1
 
-        print("decoded sentence", decoder_sentence)
+        print("\ndecoded sentence", decoder_sentence)
 
         return decoder_sentence  # , input_caption

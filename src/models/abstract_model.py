@@ -6,6 +6,7 @@ import logging
 import shutil
 import numpy as np
 from models.embeddings import EmbeddingsType
+from optimizers.optimizers import get_optimizer
 
 
 class AbstractModel(ABC):
@@ -46,7 +47,8 @@ class AbstractModel(ABC):
 
     def build(self):
         self.model.compile(
-            optimizer=tf.keras.optimizers.Adam(),
+            optimizer=get_optimizer(
+                self.args.optimizer_type, self.args.optimizer_lr),
             loss='categorical_crossentropy',
             metrics=['accuracy']  # change to categorical accuracy!
         )

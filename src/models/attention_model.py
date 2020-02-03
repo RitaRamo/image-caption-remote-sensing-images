@@ -179,7 +179,8 @@ class AttentionModel(AbstractModel):
 
     def build(self):
         self.crossentropy = tf.keras.losses.CategoricalCrossentropy()
-        self.optimizer = get_optimizer(self.args.optimizer_type)
+        self.optimizer = get_optimizer(
+            self.args.optimizer_type, self.args.optimizer_lr)
 
         # tf.keras.optimizers.Adam() get_optimizer
 
@@ -191,7 +192,8 @@ class AttentionModel(AbstractModel):
 
     def load(self):
         self.create()
-        self.optimizer = get_optimizer(self.args.optimizer_type)
+        self.optimizer = get_optimizer(
+            self.args.optimizer_type, self.args.optimizer_lr)
         #self.optimizer = tf.keras.optimizers.Adam()
         #self.optimizer = AdaMod()
         self._load_latest_checkpoint()
@@ -356,6 +358,6 @@ class AttentionModel(AbstractModel):
 
             i += 1
 
-        print("decoded sentence", decoder_sentence)
+        print("\ndecoded sentence", decoder_sentence)
 
         return decoder_sentence  # input_caption

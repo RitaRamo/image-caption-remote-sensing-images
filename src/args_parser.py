@@ -36,13 +36,15 @@ def get_args():
     parser.add_argument('--optimizer_type', type=str, default=OptimizerType.ADAM.value,
                         choices=[optimizer.value for optimizer in OptimizerType])
 
+    parser.add_argument('--optimizer_lr', type=float, default=0.001)
+
     parser.add_argument('--embedding_type', type=str, default=None,
                         choices=[model.value for model in EmbeddingsType])
 
     # parser.add_argument('--glove_emb_dim',
     #                     choices=(50, 100, 200, 300), default=50, type=int)
 
-    #print("this is parser so far", parser.parse_known_args())
+    # print("this is parser so far", parser.parse_known_args())
     opts, _ = parser.parse_known_args()
     if opts.embedding_type == EmbeddingsType.GLOVE.value:
         parser.add_argument('--embedding_size',

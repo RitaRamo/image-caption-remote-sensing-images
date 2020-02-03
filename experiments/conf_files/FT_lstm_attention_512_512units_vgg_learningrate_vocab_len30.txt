@@ -1,0 +1,16 @@
+--file_name
+FT_lstm_attention_512_512units_vgg_learningrate_vocab_len30.txt
+--model_class_str
+AttentionLSTMModel
+--batch_size
+8
+--epochs
+40
+--units
+512
+--image_model_type
+vgg16
+--embedding_size
+512
+--optimizer_lr
+0.0001
