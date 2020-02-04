@@ -1,0 +1,16 @@
+--file_name
+FT_lstm_attention_512_512_vgg_without_mask_vocab.txt
+--model_class_str
+AttentionLSTMWithoutMaskModel
+--batch_size
+8
+--epochs
+40
+--units
+512
+--image_model_type
+vgg16
+--embedding_size
+512
+--optimizer_lr
+0.0001

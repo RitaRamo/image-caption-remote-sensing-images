@@ -18,6 +18,7 @@ from models.attention_model_with_enc_initial_state import AttentionEncInitialSta
 from models.attention_model_lstm import AttentionLSTMModel
 from models.attention_model_lstm_dropout import AttentionLSTMDroupoutModel
 from models.attention_model_lstm_regularizer import AttentionLSTMRegularizerModel
+from models.attention_model_without_mask import AttentionLSTMWithoutMaskModel
 
 # from models.attention_model_with_all_context import AttentionAllContextModel
 # from models.attention_model_with_all_context2 import AttentionAllContextModel2
