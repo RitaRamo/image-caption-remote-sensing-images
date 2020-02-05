@@ -10,3 +10,5 @@ vgg16
 256
 --units
 256
+--epochs
+40
