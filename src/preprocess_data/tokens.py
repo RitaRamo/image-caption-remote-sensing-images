@@ -13,40 +13,18 @@ MAX_VOCAB = 2000
 MAX_LEN = 30
 
 
-def preprocess_tokens(train_captions):
-    all_tokens = []
-    #[START_TOKEN, END_TOKEN, OOV_TOKEN]
-    for caption_tokens in train_captions:
-        all_tokens.extend(caption_tokens)
-
-    tokens_count = Counter(all_tokens)
-    vocab = sorted(tokens_count.keys(),
-                   key=lambda x: tokens_count[x], reverse=True)[:MAX_VOCAB]
-
-    vocab.extend([START_TOKEN, END_TOKEN, OOV_TOKEN])
-
-    token_to_id = OrderedDict([(value, index+1)
-                               for index, value in enumerate(vocab)])
-    id_to_token = OrderedDict([(index+1, value)
-                               for index, value in enumerate(vocab)])
-
-    token_to_id[PAD_TOKEN] = 0
-    id_to_token[0] = PAD_TOKEN
-
-    len_vocab = len(vocab) + 1  # padding token
-
-    max_len = MAX_LEN
-
-    return len_vocab, token_to_id, id_to_token, max_len
-
-
 # def preprocess_tokens(train_captions):
-#     all_tokens = [START_TOKEN, END_TOKEN, OOV_TOKEN]
+#     all_tokens = []
+#     #[START_TOKEN, END_TOKEN, OOV_TOKEN]
 #     for caption_tokens in train_captions:
 #         all_tokens.extend(caption_tokens)
 
-#     #vocab = list(set(all_tokens))
-#     vocab = list(unique(all_tokens))
+#     tokens_count = Counter(all_tokens)
+#     vocab = sorted(tokens_count.keys(),
+#                    key=lambda x: tokens_count[x], reverse=True)[:MAX_VOCAB]
+
+#     vocab.extend([START_TOKEN, END_TOKEN, OOV_TOKEN])
+
 #     token_to_id = OrderedDict([(value, index+1)
 #                                for index, value in enumerate(vocab)])
 #     id_to_token = OrderedDict([(index+1, value)
@@ -57,9 +35,31 @@ def preprocess_tokens(train_captions):
 
 #     len_vocab = len(vocab) + 1  # padding token
 
-#     max_len = max(map(len, train_captions))
+#     max_len = MAX_LEN
 
 #     return len_vocab, token_to_id, id_to_token, max_len
+
+
+def preprocess_tokens(train_captions):
+    all_tokens = [START_TOKEN, END_TOKEN, OOV_TOKEN]
+    for caption_tokens in train_captions:
+        all_tokens.extend(caption_tokens)
+
+    #vocab = list(set(all_tokens))
+    vocab = list(unique(all_tokens))
+    token_to_id = OrderedDict([(value, index+1)
+                               for index, value in enumerate(vocab)])
+    id_to_token = OrderedDict([(index+1, value)
+                               for index, value in enumerate(vocab)])
+
+    token_to_id[PAD_TOKEN] = 0
+    id_to_token[0] = PAD_TOKEN
+
+    len_vocab = len(vocab) + 1  # padding token
+
+    max_len = max(map(len, train_captions))
+
+    return len_vocab, token_to_id, id_to_token, max_len
 
 
 def convert_captions_to_Y(captions_of_tokens, max_len, token_to_id):
