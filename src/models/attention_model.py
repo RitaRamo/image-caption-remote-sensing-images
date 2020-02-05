@@ -12,8 +12,10 @@ import logging
 from models.callbacks import EarlyStoppingWithCheckpoint
 from optimizers.optimizers import get_optimizer
 import operator
+import json
 # This attention model has the first state of decoder all zeros (and not receiving the encoder states as initial state)
 # Shape of the vector extracted from InceptionV3 is (64, 2048)
+import csv
 
 
 class Encoder(tf.keras.Model):
@@ -269,13 +271,17 @@ class AttentionModel(AbstractModel):
         return loss
 
     def train(self, train_dataset, val_dataset, len_train_dataset, len_val_dataset):
+        csvfile = open(self.get_path()+'losses.csv', 'w', newline='')
+        fieldnames = ['epoch', 'train_loss', 'val_loss']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
 
         ckpt, ckpt_manager, start_epoch = self._load_latest_checkpoint()
         early_stop = EarlyStoppingWithCheckpoint(ckpt,
                                                  ckpt_manager,
                                                  baseline=ckpt.loss if start_epoch > 0 else None,
                                                  min_delta=0.0,
-                                                 patience=3
+                                                 patience=40
                                                  )
 
         train_steps, val_steps = self._get_steps(
@@ -322,12 +328,18 @@ class AttentionModel(AbstractModel):
 
             early_stop.on_epoch_end(epoch, epoch_val_loss)
 
+            writer.writerow(
+                {'epoch': epoch, 'train_loss': round(float(epoch_loss), 4), 'val_loss': round(float(epoch_val_loss), 4)})
+
             tf.print('\n--------------- END EPOCH:{}⁄{}; Train Loss:{:.4f}; Val Loss:{:.4f} --------------\n'.format(
                 epoch, self.args.epochs, epoch_loss, epoch_val_loss))  # N_BATCH -> n_steps
 
             if early_stop.is_to_stop_training():
                 tf.print('Stop training. Best loss', ckpt.loss)
                 break
+
+  
+        csvfile.close()
 
     def generate_text(self, input_image):
         input_caption = np.zeros((1, self.max_len-1))
@@ -412,9 +424,6 @@ class AttentionModel(AbstractModel):
                 #print("\n", a)
 
             best_tokens, prob, dec_hidden = top_solutions[0]
-
-            # best_tokens=best_tokens[1:] #remove start token
-            # best_tokens=best_tokens[:-1] if best_tokens[-1]==END_TOKEN else best_tokens #remove end token
 
             best_sentence = " ".join(best_tokens)
 

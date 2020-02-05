@@ -7,6 +7,7 @@ import shutil
 import numpy as np
 from models.embeddings import EmbeddingsType
 from optimizers.optimizers import get_optimizer
+import csv
 
 
 class AbstractModel(ABC):
@@ -95,6 +96,7 @@ class AbstractModel(ABC):
         class EarlyStoppingWithCheckpoint(tf.keras.callbacks.EarlyStopping):
 
             def __init__(self,
+                         csvfile,
                          ckpt,
                          ckpt_manager,
                          monitor='val_loss',
@@ -117,11 +119,19 @@ class AbstractModel(ABC):
                 self.ckpt_manager = ckpt_manager
                 self.best = 0
                 self.wait = 0
+                self.csvfile = csvfile
+                fieldnames = ['epoch', 'train_loss', 'val_loss']
+                self.writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                self.writer.writeheader()
 
             def on_epoch_end(self, epoch, logs=None):
                 current = self.get_monitor_value(logs)
+
                 if current is None:
                     return
+
+                self.writer.writerow({'epoch': epoch, 'train_loss': round(
+                    float(logs["loss"]), 4), 'val_loss': round(float(current), 4)})
 
                 if self.monitor_op(current - self.min_delta, self.best):
 
@@ -137,12 +147,14 @@ class AbstractModel(ABC):
                         logging.info("Early stopping")
                         self.stopped_epoch = epoch
                         self.model.stop_training = True
-
-        early_stop = EarlyStoppingWithCheckpoint(ckpt,
+        csvfile = open(
+            self.get_path()+'losses.csv', 'w', newline='')
+        early_stop = EarlyStoppingWithCheckpoint(csvfile,
+                                                 ckpt,
                                                  ckpt_manager,
                                                  baseline=ckpt.loss if start_epoch > 0 else None,
                                                  min_delta=0.0,
-                                                 patience=3
+                                                 patience=40
                                                  )
 
         self.model.fit_generator(
@@ -155,6 +167,7 @@ class AbstractModel(ABC):
             initial_epoch=start_epoch,
             callbacks=[early_stop]
         )
+        early_stop.csvfile.close()
 
     def get_path(self):
         # return self.MODEL_DIRECTORY + 'trained_models/' + str(self.args.__dict__)+'.h5'
