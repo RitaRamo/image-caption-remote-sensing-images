@@ -1,0 +1,14 @@
+--file_name
+FE_S_AttentionLSTM_vgg_comparision_32batches.txt
+--model_class_str
+AttentionLSTMModel
+--image_model_type
+vgg16
+--batch_size
+32
+--embedding_size
+256
+--units
+256
+--epochs
+20
